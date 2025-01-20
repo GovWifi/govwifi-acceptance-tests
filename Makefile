@@ -9,7 +9,7 @@ test: build
 	docker compose run --rm govwifi-test
 
 .frontend:
-	git clone https://github.com/alphagov/govwifi-frontend.git .frontend
+	git clone https://github.com/GovWifi/govwifi-frontend.git .frontend
 
 .authentication-api:
 	git clone https://github.com/GovWifi/govwifi-authentication-api.git .authentication-api

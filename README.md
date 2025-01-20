@@ -36,7 +36,7 @@ to end tests, and pushing up to GitHub when all passing.
 ### Frontend
 
 These is the FreeRadius configuration, pulled from
-[govwifi-frontend](https://github.com/alphagov/govwifi-frontend) into `.frontend`.
+[govwifi-frontend](https://github.com/GovWifi/govwifi-frontend) into `.frontend`.
 
 ### Authentication
 
