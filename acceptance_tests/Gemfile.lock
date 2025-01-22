@@ -13,7 +13,7 @@ GEM
       tzinfo (~> 2.0)
     ast (2.4.2)
     base64 (0.1.1)
-    bigdecimal (3.1.8)
+    bigdecimal (3.1.9)
     concurrent-ruby (1.2.2)
     connection_pool (2.4.1)
     diff-lcs (1.5.1)
@@ -86,7 +86,7 @@ GEM
       rubocop-factory_bot (~> 2.22)
     ruby-progressbar (1.13.0)
     ruby2_keywords (0.0.5)
-    sequel (5.87.0)
+    sequel (5.88.0)
       bigdecimal
     strscan (3.1.0)
     tzinfo (2.0.6)
@@ -101,7 +101,7 @@ DEPENDENCIES
   mysql2
   rspec
   rubocop-govuk
-  sequel (~> 5.87)
+  sequel (~> 5.88)
 
 RUBY VERSION
    ruby 3.3.6
