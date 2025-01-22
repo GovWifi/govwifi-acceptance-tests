@@ -10,7 +10,7 @@ They are run whenever a change is made to this, govwifi-build, repository is mad
 To run the acceptance tests manually follow the instructions below:
 
 ```console
-make clean build test
+make clean test
 ```
 
 If you make changes to any of the checked out apps you will want to rerun the

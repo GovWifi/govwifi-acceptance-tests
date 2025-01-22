@@ -1,7 +1,7 @@
 .backend
-.frontend
-.logging-api
-.authentication-api
+.frontend/
+.logging-api/
+.authentication-api/
 acceptance_tests/.certs
 fake-s3/.certs
 fake-s3/*.pem
