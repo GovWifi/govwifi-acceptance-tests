@@ -1,0 +1,13 @@
+version: 0.2
+phases:
+  pre_build:
+    commands:
+    - echo "$DOCKER_HUB_AUTHTOKEN_ENV" | docker login -u $(echo $DOCKER_HUB_USERNAME_ENV) --password-stdin
+    - git clone -b $FRONTEND_BRANCH https://github.com/alphagov/govwifi-frontend.git .frontend
+    - git clone -b $AUTH_API_BRANCH https://github.com/alphagov/govwifi-authentication-api.git .authentication-api
+    - git clone -b $LOGGING_API_BRANCH https://github.com/alphagov/govwifi-logging-api.git .logging-api
+
+  build:
+    commands:
+    - echo "Acceptance tests running"
+    - make test-ci

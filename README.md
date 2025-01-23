@@ -13,12 +13,18 @@ To run the acceptance tests manually follow the instructions below:
 make clean test
 ```
 
+would recommend to tear down the environment after use to free up resources, to do so run
+
+```console
+make clean destroy
+```
+
 If you make changes to any of the checked out apps you will want to rerun the
 above command to rebuild and test your changes.
 
 ## CI/CD
 
-The GitHub action triggered when creating a PR and the AWS CodeBuild job which runs the acceptance tests when building images for the tested apps both call `make test` to execute the tests.
+The GitHub action is triggered when creating a PR which calls 'make test' and the AWS CodeBuild job which runs the acceptance tests when building images for the tested apps which calls `make test-ci` to allow for custom branches to be tested, which can be set via the codebuild job.
 
 ## Developing within localstack
 
