@@ -36,8 +36,7 @@ GEM
     rack (3.0.9.1)
     rainbow (3.1.1)
     regexp_parser (2.8.2)
-    rexml (3.3.9)
-      strscan
+    rexml (3.4.0)
     rspec (3.13.0)
       rspec-core (~> 3.13.0)
       rspec-expectations (~> 3.13.0)
@@ -86,7 +85,7 @@ GEM
       rubocop-factory_bot (~> 2.22)
     ruby-progressbar (1.13.0)
     ruby2_keywords (0.0.5)
-    sequel (5.88.0)
+    sequel (5.89.0)
       bigdecimal
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
@@ -100,7 +99,7 @@ DEPENDENCIES
   mysql2
   rspec
   rubocop-govuk
-  sequel (~> 5.88)
+  sequel (~> 5.89)
 
 RUBY VERSION
    ruby 3.3.6
