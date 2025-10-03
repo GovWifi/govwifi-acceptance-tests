@@ -78,6 +78,8 @@ services:
       - raddb-certs:/etc/raddb/certs
 
   govwifi-authentication-api-local:
+    ports:
+      - "18080:8080"
     build:
       context: .authentication-api
       args:
