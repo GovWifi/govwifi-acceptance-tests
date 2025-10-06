@@ -146,12 +146,9 @@ services:
     build:
       context: local-dev
     depends_on:
-      govwifi-logging-api-local:
-        condition: service_healthy
-      govwifi-authentication-api-local:
-        condition: service_healthy
-      govwifi-frontend-local:
-        condition: service_healthy
+      - govwifi-logging-api-local
+      - govwifi-authentication-api-local
+      - govwifi-frontend-local
     entrypoint: '/bin/sh -c ''while true ; do sleep 10 ; echo "sleeping..." ; done'''
     environment:
       DB_HOSTNAME: govwifi-sessions-db
