@@ -37,6 +37,8 @@ services:
       - ./fake-s3/localstack-init:/etc/localstack/init/ready.d
 
   govwifi-frontend-local:
+    ports:
+      - "1812-1813:1812-1813/udp"
     build:
       context: .frontend
     depends_on:
@@ -166,6 +168,8 @@ services:
       AWS_SECRET_ACCESS_KEY: testsecret
       CERT_STORE_BUCKET: s3://certs-bucket
       ENDPOINT_URL: "http://govwifi-fake-s3:4566"
+    volumes:
+      - ./:/app
 
 volumes:
   raddb-certs:
