@@ -151,6 +151,7 @@ services:
       - govwifi-logging-api-local
       - govwifi-authentication-api-local
       - govwifi-frontend-local
+      - govwifi-fake-s3
     entrypoint: '/bin/sh -c ''while true ; do sleep 10 ; echo "sleeping..." ; done'''
     environment:
       DB_HOSTNAME: govwifi-sessions-db

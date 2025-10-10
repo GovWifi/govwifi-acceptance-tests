@@ -57,3 +57,49 @@ This is the Logging API, also known as PostAuth in the Radius domain
 
 It is pulled from the [govwifi-logging-api](https://github.com/GovWifi/govwifi-logging-api) repository
 and placed into the `.logging-api` folder.
+
+### Local Shell
+
+This is a tool to aid in learning and local development. It provides a running
+shell. From which you can run tools to run epol_test or use cURL to make API calls to local running services, inside the docker network.
+
+```
+
+# From the cli
+make shell
+
+# See docker-compose.yml for credential details.
+
+# Connect see the userdetails we can use.
+#
+echo "select username, password, email, mobile from userdetails;" | \
+ mariadb --skip-ssl --host=govwifi-user-details-db --password=testpassword -u root govwifi_local
+
+# username password email mobile
+# DSLPR SharpRegainDetailed NULL NULL
+
+# Recover the user authorisation password from the authentication API:
+#
+curl -s http://govwifi-authentication-api-local:8080/authorize/user/DSLPR | jq .
+{
+  "control:Cleartext-Password": "SharpRegainDetailed"
+}
+
+RADIUS_SERVER_IP=$(getent hosts govwifi-frontend-local | awk '{print $1}')
+echo "RADIUS_SERVER_IP=$RADIUS_SERVER_IP"
+
+# Copy certs and configuration from the localstack S3 bucket. This will allow
+# use to test EAP-PEAP and EAP-TLS calls out local Radius server:
+#
+aws --endpoint-url=${ENDPOINT_URL} s3 cp ${CERT_STORE_BUCKET}/ /usr/src/app/certs/ --recursive
+
+
+# Perform an eapol_test against the Radius server using PEAP:
+eapol_test -a $RADIUS_SERVER_IP -c /usr/src/app/eap-peap.conf   -s testingradiussecret
+
+
+# Perform an eapol_test against the Radius server using EAP-TLS:
+eapol_test -a $RADIUS_SERVER_IP -c /usr/src/app/eap-peap.conf   -s testingradiussecret
+
+
+```
