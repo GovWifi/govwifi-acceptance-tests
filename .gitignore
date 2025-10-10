@@ -1,9 +1,12 @@
+.authentication-api
+.frontend
+.user-signup-api
+.logging-api
 .backend
-.frontend/
-.logging-api/
-.authentication-api/
+.admin
 acceptance_tests/.certs
 fake-s3/.certs
 fake-s3/*.pem
 fake-s3/cache/*
 fake-s3/logs/*
+eap.conf
