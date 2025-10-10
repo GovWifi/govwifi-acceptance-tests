@@ -25,6 +25,9 @@ shell: local-dev
 tail-logs:
 	docker compose logs -f
 
+.admin:
+	git clone https://github.com/GovWifi/govwifi-admin.git .admin
+
 .frontend:
 	git clone https://github.com/GovWifi/govwifi-frontend.git .frontend
 

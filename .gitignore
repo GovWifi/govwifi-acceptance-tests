@@ -3,6 +3,7 @@
 .user-signup-api
 .logging-api
 .backend
+.admin
 acceptance_tests/.certs
 fake-s3/.certs
 fake-s3/*.pem

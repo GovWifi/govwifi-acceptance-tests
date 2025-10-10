@@ -99,7 +99,7 @@ eapol_test -a $RADIUS_SERVER_IP -c /usr/src/app/eap-peap.conf   -s testingradius
 
 
 # Perform an eapol_test against the Radius server using EAP-TLS:
-eapol_test -a $RADIUS_SERVER_IP -c /usr/src/app/eap-peap.conf   -s testingradiussecret
+eapol_test -a $RADIUS_SERVER_IP -c /usr/src/app/eap-tls.conf   -s testingradiussecret
 
 
 ```
