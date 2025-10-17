@@ -1,5 +1,7 @@
 services:
   govwifi-sessions-db:
+    ports:
+      - "13306:3306"
     image: mysql:8.0
     environment:
       MYSQL_ROOT_PASSWORD: testpassword
@@ -37,15 +39,17 @@ services:
       - ./fake-s3/localstack-init:/etc/localstack/init/ready.d
 
   govwifi-frontend-local:
+    ports:
+      - "1812-1813:1812-1813/udp"
     build:
       context: .frontend
     depends_on:
       - govwifi-logging-api-local
       - govwifi-authentication-api-local
-    healthcheck:
-      test: "[ $$(curl --write-out '%{http_code}' --silent --output /dev/null 127.0.0.1:3000) -eq 200 ]"
-      interval: 10s
-      retries: 30
+    # healthcheck:
+    #   test: "[ $$(curl --write-out '%{http_code}' --silent --output /dev/null 127.0.0.1:3000) -eq 200 ]"
+    #   interval: 10s
+    #   retries: 30
     environment:
       APP_ENV: production
       AUTHORISATION_API_BASE_URL: "http://govwifi-authentication-api-local:8080"
@@ -78,6 +82,8 @@ services:
       - raddb-certs:/etc/raddb/certs
 
   govwifi-authentication-api-local:
+    ports:
+      - "18080:8080"
     build:
       context: .authentication-api
       args:
@@ -96,7 +102,7 @@ services:
 
   govwifi-logging-api-local:
     ports:
-      - "8080:8080"
+      - "28080:8080"
     build:
       context: .logging-api
       args:
@@ -139,6 +145,97 @@ services:
       AWS_SECRET_ACCESS_KEY: testsecret
       CERT_STORE_BUCKET: s3://certs-bucket
       ENDPOINT_URL: "http://govwifi-fake-s3:4566"
+
+  govwifi-admin-db:
+    image: mysql:8.0
+    command: "--default-authentication-plugin=mysql_native_password"
+    environment:
+      MYSQL_ROOT_PASSWORD: testpassword
+      MYSQL_DATABASE: admin_govwifi
+    # volumes:
+    #   - ./init_user_details_db:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: "mysql --user=root --password=testpassword -e 'SELECT 1'"
+
+  govwifi-admin:
+    ports:
+      - "38080:3000"
+    build:
+      context: .admin
+      args:
+        BUNDLE_INSTALL_FLAGS: "${BUNDLE_INSTALL_FLAGS:- --jobs 20 --retry 5}"
+    restart: on-failure
+    depends_on:
+      govwifi-user-details-db:
+        condition: service_healthy
+      govwifi-admin-db:
+        condition: service_healthy
+    environment:
+      # IP of local radius?
+      # DUBLIN_RADIUS_IPS:
+      # LONDON_RADIUS_IPS:
+
+      # Local logging api?
+      # ELASTICSEARCH_ENDPOINT:
+      # LOGGING_API_SEARCH_ENDPOINT:
+
+      # test key...
+      # NOTIFY_API_KEY:
+      #
+      RACK_ENV: development
+      RAILS_ENV: development
+      BYPASS_2FA: true
+      FULLY_QUALIFIED_DOMAIN_NAME: govwifi-admin.local
+      USER_DB_HOST: govwifi-user-details-db
+      USER_DB_NAME: govwifi_local
+      USER_DB_PASS: testpassword
+      USER_DB_USER: root
+      # Note to self: RR_DB_HOST is the read replica of the session db in aws.
+      RR_DB_HOST: govwifi-sessions-db
+      RR_DB_NAME: govwifi_local
+      RR_DB_PASS: testpassword
+      RR_DB_USER: root
+      DB_HOST: govwifi-admin-db
+      DB_NAME: admin_govwifi
+      DB_PASS: testpassword
+      DB_USER: root
+      RADIUS_KEY: testingradiussecret
+      AWS_DEFAULT_REGION: eu-west-1
+      AWS_ACCESS_KEY_ID: testkey
+      AWS_SECRET_ACCESS_KEY: testsecret
+      CERT_STORE_BUCKET: s3://certs-bucket
+      ENDPOINT_URL: "http://govwifi-fake-s3:4566"
+    volumes:
+      - ./:/app
+
+  local-dev:
+    build:
+      context: local-dev
+    depends_on:
+      - govwifi-logging-api-local
+      - govwifi-authentication-api-local
+      - govwifi-frontend-local
+      - govwifi-fake-s3
+      - govwifi-admin
+    entrypoint: '/bin/sh -c ''while true ; do sleep 10 ; echo "sleeping..." ; done'''
+    environment:
+      DB_HOSTNAME: govwifi-sessions-db
+      DB_NAME: govwifi_local
+      DB_USER: root
+      DB_PASS: testpassword
+      USER_DB_NAME: govwifi_local
+      USER_DB_PASS: testpassword
+      USER_DB_USER: root
+      USER_DB_HOSTNAME: govwifi-user-details-db
+      FRONTEND_CONTAINER: govwifi-frontend-local
+      RADIUS_KEY: testingradiussecret
+      AWS_DEFAULT_REGION: eu-west-1
+      AWS_ACCESS_KEY_ID: testkey
+      AWS_SECRET_ACCESS_KEY: testsecret
+      CERT_STORE_BUCKET: s3://certs-bucket
+      ENDPOINT_URL: "http://govwifi-fake-s3:4566"
+    volumes:
+      - ./:/app
 
 volumes:
   raddb-certs:
