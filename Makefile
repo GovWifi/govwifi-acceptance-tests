@@ -21,6 +21,10 @@ local-dev:
 shell: local-dev
 	docker compose exec local-dev /bin/sh
 
+.PHONY: admin-shell
+admin-shell: local-dev
+	docker compose exec govwifi-admin /bin/sh
+
 .PHONY: tail-logs
 tail-logs:
 	docker compose logs -f

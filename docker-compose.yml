@@ -1,5 +1,7 @@
 services:
   govwifi-sessions-db:
+    ports:
+      - "13306:3306"
     image: mysql:8.0
     environment:
       MYSQL_ROOT_PASSWORD: testpassword
@@ -44,10 +46,10 @@ services:
     depends_on:
       - govwifi-logging-api-local
       - govwifi-authentication-api-local
-    healthcheck:
-      test: "[ $$(curl --write-out '%{http_code}' --silent --output /dev/null 127.0.0.1:3000) -eq 200 ]"
-      interval: 10s
-      retries: 30
+    # healthcheck:
+    #   test: "[ $$(curl --write-out '%{http_code}' --silent --output /dev/null 127.0.0.1:3000) -eq 200 ]"
+    #   interval: 10s
+    #   retries: 30
     environment:
       APP_ENV: production
       AUTHORISATION_API_BASE_URL: "http://govwifi-authentication-api-local:8080"
@@ -180,6 +182,9 @@ services:
       # test key...
       # NOTIFY_API_KEY:
       #
+      RACK_ENV: development
+      RAILS_ENV: development
+      BYPASS_2FA: true
       FULLY_QUALIFIED_DOMAIN_NAME: govwifi-admin.local
       USER_DB_HOST: govwifi-user-details-db
       USER_DB_NAME: govwifi_local

@@ -93,13 +93,16 @@ echo "RADIUS_SERVER_IP=$RADIUS_SERVER_IP"
 #
 aws --endpoint-url=${ENDPOINT_URL} s3 cp ${CERT_STORE_BUCKET}/ /usr/src/app/certs/ --recursive
 
-
 # Perform an eapol_test against the Radius server using PEAP:
 eapol_test -a $RADIUS_SERVER_IP -c /usr/src/app/eap-peap.conf   -s testingradiussecret
 
-
 # Perform an eapol_test against the Radius server using EAP-TLS:
+#
+# Successfull call
 eapol_test -a $RADIUS_SERVER_IP -c /usr/src/app/eap-tls.conf   -s testingradiussecret
+
+# Rejected calll
+eapol_test -a $RADIUS_SERVER_IP -c /usr/src/app/eap-tls-reject.conf   -s testingradiussecret
 
 
 ```
