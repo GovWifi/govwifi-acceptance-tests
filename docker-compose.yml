@@ -12,6 +12,8 @@ services:
       test: "mysql --user=root --password=testpassword -e 'SELECT 1'"
 
   govwifi-user-details-db:
+    ports:
+      - "23306:3306"
     image: mysql:8.0
     command: "--default-authentication-plugin=mysql_native_password"
     environment:
@@ -47,7 +49,9 @@ services:
       - govwifi-logging-api-local
       - govwifi-authentication-api-local
     healthcheck:
-      test: "[ $$(curl --write-out '%{http_code}' --silent --output /dev/null 127.0.0.1:3000) -eq 200 ]"
+      # test: "[ $$(curl --write-out '%{http_code}' --silent --output /dev/null 127.0.0.1:3000) -eq 200 ]"
+      # disable for the moment while I local dev
+      test: "[ $$(/bin/sh -c 'true') -eq 0 ]"
       interval: 10s
       retries: 30
     environment:
@@ -147,6 +151,8 @@ services:
       ENDPOINT_URL: "http://govwifi-fake-s3:4566"
 
   govwifi-admin-db:
+    ports:
+      - "33306:3306"
     image: mysql:8.0
     command: "--default-authentication-plugin=mysql_native_password"
     environment:

@@ -85,24 +85,46 @@ curl -s http://govwifi-authentication-api-local:8080/authorize/user/DSLPR | jq .
   "control:Cleartext-Password": "SharpRegainDetailed"
 }
 
-RADIUS_SERVER_IP=$(getent hosts govwifi-frontend-local | awk '{print $1}')
-echo "RADIUS_SERVER_IP=$RADIUS_SERVER_IP"
+# Configure the environment for testing
+source ./setup.sh
 
-# Copy certs and configuration from the localstack S3 bucket. This will allow
-# use to test EAP-PEAP and EAP-TLS calls out local Radius server:
+# Perform an eapol_test against the Radius server using PEAP for ok/fail scenarios:
 #
-aws --endpoint-url=${ENDPOINT_URL} s3 cp ${CERT_STORE_BUCKET}/ /usr/src/app/certs/ --recursive
+eapol_test -a $RADIUS_SERVER_IP -c /usr/src/app/eap-peap-password-ok.conf   -s testingradiussecret
 
-# Perform an eapol_test against the Radius server using PEAP:
-eapol_test -a $RADIUS_SERVER_IP -c /usr/src/app/eap-peap.conf   -s testingradiussecret
+eapol_test -a $RADIUS_SERVER_IP -c /usr/src/app/eap-peap-incorrect-password.conf   -s testingradiussecret
+
 
 # Perform an eapol_test against the Radius server using EAP-TLS:
 #
 # Successfull call
 eapol_test -a $RADIUS_SERVER_IP -c /usr/src/app/eap-tls.conf   -s testingradiussecret
 
-# Rejected calll
-eapol_test -a $RADIUS_SERVER_IP -c /usr/src/app/eap-tls-reject.conf   -s testingradiussecret
+# CBA Fail Testing
+#
+eapol_test -a $RADIUS_SERVER_IP -c /usr/src/app/eap-tls-reject-client-key-not-found.conf -s testingradiussecret
+
+eapol_test -a $RADIUS_SERVER_IP -c /usr/src/app/eap-tls-mismatch-key.conf -s testingradiussecret
+
+```
+
+Admin site set up
+
+```
+
+./bin/rails console
+
+
+# admin@example.com
+# tagged-amount-gotcha
+#
+user = User.new({
+ email: 'admin@example.com',
+  password: 'tagged-amount-gotcha',
+  password_confirmation: 'tagged-amount-gotcha'
+})
+user.confirm
+user.save
 
 
 ```
