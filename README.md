@@ -108,7 +108,7 @@ eapol_test -a $RADIUS_SERVER_IP -c /usr/src/app/eap-tls-mismatch-key.conf -s tes
 
 ```
 
-### Admin site set up to recieve traffic
+### Local admin site set up to recieve traffic
 
 Connect the admin console and setup an organisation to receive.
 
