@@ -63,7 +63,7 @@ and placed into the `.logging-api` folder.
 This is a tool to aid in learning and local development. It provides a running
 shell. From which you can run tools to run epol_test or use cURL to make API calls to local running services, inside the docker network.
 
-```shell
+```
 
 # From the cli
 make shell
@@ -108,21 +108,19 @@ eapol_test -a $RADIUS_SERVER_IP -c /usr/src/app/eap-tls-mismatch-key.conf -s tes
 
 ```
 
-### Local admin site set up to recieve traffic
+### Admin site set up to recieve traffice
 
 Connect the admin console and setup an organisation to receive.
 
-```shell
+*Note*: I modified the `address_is_not_private` in the file `govwifi-admin/lib/use_cases/administrator/check_if_valid_ip.rb`
+to always return false. I need to be able to allow private IPs for this test. I
+think we can make this an environment option for testing.
+
+```
 
 make admin-shell
 
 ./bin/rails console
-
-```
-
-Now in the console run the following to create an organisation:
-
-```ruby
 
 user = User.new({
  name: 'Joe Admin',
@@ -149,38 +147,7 @@ mou1 = Mou.create!(name:'Joe Admin', email_address: 'admin@example.com', job_rol
 
 loc1 = Location.create!(address: 'Upper Street, Islington', postcode: 'N1 2XF', organisation: org)
 
-```
-
-In order to test locally with the docker network you will need to add a private
-IP address for the site. The code won't work as the `address_is_not_private` in
-the file `govwifi-admin/lib/use_cases/administrator/check_if_valid_ip.rb` prevents
-this.
-
-```ruby
 # 1970-01-01 to bypass the admin 10 day restriction to see the "view traffic" option for the site:
 ips1 = Ip.create!(address: '172.20.0.10', location: loc1, created_at: '1970-01-01')
-
-(govwifi-admin):27:in '<top (required)>': Validation failed: Address '172.20.0.10' is a private IP address. Only public IPv4 addresses can be added. (ActiveRecord::RecordInvalid)
-
-```
-
-Instead, you can directly insert it using SQL:
-
-```sql
-
-INSERT INTO admin_govwifi.ips (
- id,
- address,
- created_at,
- updated_at,
- location_id
-)
-Values (
-  1,
-  '172.20.0.10',
-  '2020-10-22 18:17',
-  '2020-10-22 18:17',
-  1
-)
 
 ```
