@@ -63,7 +63,7 @@ and placed into the `.logging-api` folder.
 This is a tool to aid in learning and local development. It provides a running
 shell. From which you can run tools to run epol_test or use cURL to make API calls to local running services, inside the docker network.
 
-```console
+```shell
 
 # From the cli
 make shell
@@ -111,7 +111,7 @@ eapol_test -a $RADIUS_SERVER_IP -c /usr/src/app/eap-tls-mismatch-key.conf -s tes
 ### Admin site set up to recieve traffice
 
 *Note*: I modified the `address_is_not_private` in the file `govwifi-admin/lib/use_cases/administrator/check_if_valid_ip.rb`
-to always return false. I need to be able to allow private IPs for this test. I
+to always return `true`. I need to be able to allow private IPs for this test. I
 think we can make this an environment option for testing.
 
 Connect the admin console and setup an organisation to receive traffic:
