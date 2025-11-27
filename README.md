@@ -110,11 +110,9 @@ eapol_test -a $RADIUS_SERVER_IP -c /usr/src/app/eap-tls-mismatch-key.conf -s tes
 
 ### Admin site set up to recieve traffice
 
-*Note*: I modified the `address_is_not_private` in the file `govwifi-admin/lib/use_cases/administrator/check_if_valid_ip.rb`
-to always return `true`. I need to be able to allow private IPs for this test. I
-think we can make this an environment option for testing.
-
-Connect the admin console and setup an organisation to receive traffic:
+Connect the admin console and setup an organisation to receive traffic. This
+by passes the IP check on private addresses. This in turn allows us to receive
+traffic from our docker compose network.
 
 ```shell
 
@@ -137,6 +135,16 @@ user = User.new({
 user.confirm
 user.save
 
+user2 = User.new({
+ name: 'Tina Admin',
+ email: 'admin+tina@example.com',
+  password: 'tagged-amount-gotcha',
+  password_confirmation: 'tagged-amount-gotcha',
+  is_super_admin: true
+})
+user2.confirm
+user2.save
+
 org = Organisation.new({
  name: 'Civil Aviation Authority',
  service_email: 'admin+civil@example.com'
@@ -145,6 +153,10 @@ org = Organisation.new({
 org.save
 
 memb = org.memberships.create(user: user)
+memb.confirm!
+memb.save
+
+memb = org.memberships.create(user: user2)
 memb.confirm!
 memb.save
 

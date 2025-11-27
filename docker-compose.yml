@@ -211,6 +211,9 @@ services:
       AWS_SECRET_ACCESS_KEY: testsecret
       CERT_STORE_BUCKET: s3://certs-bucket
       ENDPOINT_URL: "http://govwifi-fake-s3:4566"
+      # Testing only: Allow private IP address from docker compose network. By
+      # default private IPs are blocked.
+      ALLOW_LOCATION_PRIVATE_ADDRESS_USE: "true"
     volumes:
       - ./:/app
 
