@@ -6,7 +6,4 @@
 export RADIUS_SERVER_IP=$(getent hosts govwifi-frontend | awk '{print $1}')
 echo "RADIUS_SERVER_IP=$RADIUS_SERVER_IP"
 
-# Copy certs and configuration from the localstack S3 bucket. This will allow
-# use to test EAP-PEAP and EAP-TLS calls out local Radius server:
-#
-aws --endpoint-url=${ENDPOINT_URL} s3 cp ${CERT_STORE_BUCKET}/ /usr/src/app/certs/ --recursive
+bundle exec rails runner /tmp/admin_database_configuration.rb $RADIUS_SERVER_IP

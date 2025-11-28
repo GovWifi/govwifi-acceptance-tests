@@ -90,9 +90,9 @@ source ./setup.sh
 
 # Perform an eapol_test against the Radius server using PEAP for ok/fail scenarios:
 #
-eapol_test -a $RADIUS_SERVER_IP -c /usr/src/app/eap-peap-password-ok.conf   -s testingradiussecret
+eapol_test -a $RADIUS_SERVER_IP -c /usr/src/app/eap-peap-password-ok.conf -s testingradiussecret
 
-eapol_test -a $RADIUS_SERVER_IP -c /usr/src/app/eap-peap-incorrect-password.conf   -s testingradiussecret
+eapol_test -a $RADIUS_SERVER_IP -c /usr/src/app/eap-peap-incorrect-password.conf -s testingradiussecret
 
 
 # Perform an eapol_test against the Radius server using EAP-TLS:

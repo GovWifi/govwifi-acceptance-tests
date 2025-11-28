@@ -1,3 +1,5 @@
+RADIUS_SERVER_IP := $()
+
 setup: .frontend .authentication-api .logging-api .user-signup-api
 
 build:
@@ -31,8 +33,9 @@ console: local-dev
 
 .PHONY: admin-db-setup
 admin-db-setup: local-dev
+	docker compose cp local-dev/admin-db-setup.sh govwifi-admin:/tmp
 	docker compose cp local-dev/admin_database_configuration.rb govwifi-admin:/tmp
-	docker compose exec govwifi-admin bundle exec rails runner /tmp/admin_database_configuration.rb
+	docker compose exec govwifi-admin /bin/sh /tmp/admin-db-setup.sh
 
 .PHONY: tail-logs
 tail-logs:

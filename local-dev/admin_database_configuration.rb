@@ -1,3 +1,13 @@
+# The RaDIUS server IP can be different across machines. The current IP will
+# be passed as an argument to this script
+RADIUS_SERVER_IP = ARGV[0]
+puts "Configuring admin and using RADIUS server IP '#{RADIUS_SERVER_IP}' for location traffic."
+
+if User.where(email: 'admin@example.com').present?
+  puts "Set up has been run already."
+  return
+end
+
 user = User.new({
  name: 'Joe Admin',
  email: 'admin@example.com',
@@ -38,4 +48,4 @@ mou1 = Mou.create!(name:'Joe Admin', email_address: 'admin@example.com', job_rol
 loc1 = Location.create!(address: 'Upper Street, Islington', postcode: 'N1 2XF', organisation: org)
 
 # 1970-01-01 to bypass the admin 10 day restriction to see the "view traffic" option for the site:
-ips1 = Ip.create!(address: '172.20.0.10', location: loc1, created_at: '1970-01-01')
+ips1 = Ip.create!(address: RADIUS_SERVER_IP, location: loc1, created_at: '1970-01-01')
