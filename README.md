@@ -58,7 +58,19 @@ This is the Logging API, also known as PostAuth in the Radius domain
 It is pulled from the [govwifi-logging-api](https://github.com/GovWifi/govwifi-logging-api) repository
 and placed into the `.logging-api` folder.
 
-### Local Shell
+## Local Shell
+
+### Admin site set up to recieve traffic
+
+Set up testing Organisation and Location ready to begin. This will use the `local-dev/admin_database_configuration.rb` when setting up the database.
+
+```shell
+
+make admin-db-setup
+
+```
+
+### Radius Testing with eapol_test
 
 This is a tool to aid in learning and local development. It provides a running
 shell. From which you can run tools to run epol_test or use cURL to make API calls to local running services, inside the docker network.
@@ -105,15 +117,5 @@ eapol_test -a $RADIUS_SERVER_IP -c /usr/src/app/eap-tls.conf   -s testingradiuss
 eapol_test -a $RADIUS_SERVER_IP -c /usr/src/app/eap-tls-reject-client-key-not-found.conf -s testingradiussecret
 
 eapol_test -a $RADIUS_SERVER_IP -c /usr/src/app/eap-tls-mismatch-key.conf -s testingradiussecret
-
-```
-
-### Admin site set up to recieve traffic
-
-Set up testing Organisation and Location ready to begin. This will use the `local-dev/admin_database_configuration.rb` when setting up the database.
-
-```shell
-
-make admin-db-setup
 
 ```
