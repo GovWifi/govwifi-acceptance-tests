@@ -25,6 +25,15 @@ shell: local-dev
 admin-shell: local-dev
 	docker compose exec govwifi-admin /bin/sh
 
+.PHONY: console
+console: local-dev
+	docker compose exec govwifi-admin /usr/local/bundle/bin/rails console
+
+.PHONY: admin-db-setup
+admin-db-setup: local-dev
+	docker compose cp local-dev/admin_database_configuration.rb govwifi-admin:/tmp
+	docker compose exec govwifi-admin bundle exec rails runner /tmp/admin_database_configuration.rb
+
 .PHONY: tail-logs
 tail-logs:
 	docker compose logs -f

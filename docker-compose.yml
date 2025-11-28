@@ -40,14 +40,14 @@ services:
       - ./fake-s3:/var/lib/localstack
       - ./fake-s3/localstack-init:/etc/localstack/init/ready.d
 
-  govwifi-frontend-local:
+  govwifi-frontend:
     ports:
       - "1812-1813:1812-1813/udp"
     build:
       context: .frontend
     depends_on:
-      - govwifi-logging-api-local
-      - govwifi-authentication-api-local
+      - govwifi-logging-api
+      - govwifi-authentication-api
     healthcheck:
       # test: "[ $$(curl --write-out '%{http_code}' --silent --output /dev/null 127.0.0.1:3000) -eq 200 ]"
       # disable for the moment while I local dev
@@ -56,8 +56,8 @@ services:
       retries: 30
     environment:
       APP_ENV: production
-      AUTHORISATION_API_BASE_URL: "http://govwifi-authentication-api-local:8080"
-      LOGGING_API_BASE_URL: "http://govwifi-logging-api-local:8080"
+      AUTHORISATION_API_BASE_URL: "http://govwifi-authentication-api:8080"
+      LOGGING_API_BASE_URL: "http://govwifi-logging-api:8080"
       RADIUS_CONFIG_ALLOWLIST_URL: "http://govwifi-fake-s3:4566/clients.conf"
       HEALTH_CHECK_RADIUS_KEY: RrPTmh8s9NZFenAFx2kG
       HEALTH_CHECK_SSID: GovWifi
@@ -67,7 +67,7 @@ services:
     volumes:
       - raddb-certs:/etc/raddb/certs
 
-  govwifi-frontend-raddb-local:
+  govwifi-frontend-raddb:
     build:
       context: .frontend
       dockerfile: Dockerfile.raddb
@@ -85,7 +85,7 @@ services:
     volumes:
       - raddb-certs:/etc/raddb/certs
 
-  govwifi-authentication-api-local:
+  govwifi-authentication-api:
     ports:
       - "18080:8080"
     build:
@@ -104,7 +104,7 @@ services:
       govwifi-user-details-db:
         condition: service_healthy
 
-  govwifi-logging-api-local:
+  govwifi-logging-api:
     ports:
       - "28080:8080"
     build:
@@ -131,7 +131,7 @@ services:
     build:
       context: acceptance_tests
     depends_on:
-      govwifi-frontend-local:
+      govwifi-frontend:
         condition: service_healthy
     environment:
       DB_HOSTNAME: govwifi-sessions-db
@@ -142,7 +142,7 @@ services:
       USER_DB_PASS: testpassword
       USER_DB_USER: root
       USER_DB_HOSTNAME: govwifi-user-details-db
-      FRONTEND_CONTAINER: govwifi-frontend-local
+      FRONTEND_CONTAINER: govwifi-frontend
       RADIUS_KEY: testingradiussecret
       AWS_DEFAULT_REGION: eu-west-1
       AWS_ACCESS_KEY_ID: testkey
@@ -188,8 +188,7 @@ services:
       # test key...
       # NOTIFY_API_KEY:
       #
-      RACK_ENV: development
-      RAILS_ENV: development
+      DEPLOY_ENV: development
       BYPASS_2FA: true
       FULLY_QUALIFIED_DOMAIN_NAME: govwifi-admin.local
       USER_DB_HOST: govwifi-user-details-db
@@ -211,9 +210,10 @@ services:
       AWS_SECRET_ACCESS_KEY: testsecret
       CERT_STORE_BUCKET: s3://certs-bucket
       ENDPOINT_URL: "http://govwifi-fake-s3:4566"
+      RAILS_LOG_TO_STDOUT: "true"
       # Testing only: Allow private IP address from docker compose network. By
       # default private IPs are blocked.
-      ALLOW_LOCATION_PRIVATE_ADDRESS_USE: "true"
+      ALLOW_PRIVATE_IP_FOR_LOCATION: "true"
     volumes:
       - ./:/app
 
@@ -221,9 +221,9 @@ services:
     build:
       context: local-dev
     depends_on:
-      - govwifi-logging-api-local
-      - govwifi-authentication-api-local
-      - govwifi-frontend-local
+      - govwifi-logging-api
+      - govwifi-authentication-api
+      - govwifi-frontend
       - govwifi-fake-s3
       - govwifi-admin
     entrypoint: '/bin/sh -c ''while true ; do sleep 10 ; echo "sleeping..." ; done'''
@@ -236,7 +236,7 @@ services:
       USER_DB_PASS: testpassword
       USER_DB_USER: root
       USER_DB_HOSTNAME: govwifi-user-details-db
-      FRONTEND_CONTAINER: govwifi-frontend-local
+      FRONTEND_CONTAINER: govwifi-frontend
       RADIUS_KEY: testingradiussecret
       AWS_DEFAULT_REGION: eu-west-1
       AWS_ACCESS_KEY_ID: testkey

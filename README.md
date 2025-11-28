@@ -108,63 +108,12 @@ eapol_test -a $RADIUS_SERVER_IP -c /usr/src/app/eap-tls-mismatch-key.conf -s tes
 
 ```
 
-### Admin site set up to recieve traffice
+### Admin site set up to recieve traffic
 
-Connect the admin console and setup an organisation to receive traffic. This
-by passes the IP check on private addresses. This in turn allows us to receive
-traffic from our docker compose network.
+Set up testing Organisation and Location ready to begin. This will use the `local-dev/admin_database_configuration.rb` when setting up the database.
 
 ```shell
 
-make admin-shell
-
-./bin/rails console
-
-```
-
-Now in the console run the following code:
-
-```Ruby
-user = User.new({
- name: 'Joe Admin',
- email: 'admin@example.com',
-  password: 'tagged-amount-gotcha',
-  password_confirmation: 'tagged-amount-gotcha',
-  is_super_admin: true
-})
-user.confirm
-user.save
-
-user2 = User.new({
- name: 'Tina Admin',
- email: 'admin+tina@example.com',
-  password: 'tagged-amount-gotcha',
-  password_confirmation: 'tagged-amount-gotcha',
-  is_super_admin: true
-})
-user2.confirm
-user2.save
-
-org = Organisation.new({
- name: 'Civil Aviation Authority',
- service_email: 'admin+civil@example.com'
-
-})
-org.save
-
-memb = org.memberships.create(user: user)
-memb.confirm!
-memb.save
-
-memb = org.memberships.create(user: user2)
-memb.confirm!
-memb.save
-
-mou1 = Mou.create!(name:'Joe Admin', email_address: 'admin@example.com', job_role: 'Sys Admin', organisation: org, user: user, version: Mou.latest_known_version)
-
-loc1 = Location.create!(address: 'Upper Street, Islington', postcode: 'N1 2XF', organisation: org)
-
-# 1970-01-01 to bypass the admin 10 day restriction to see the "view traffic" option for the site:
-ips1 = Ip.create!(address: '172.20.0.10', location: loc1, created_at: '1970-01-01')
+make admin-db-setup
 
 ```
