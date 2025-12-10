@@ -114,6 +114,7 @@ services:
     environment:
       APP_ENV: production
       DB_HOSTNAME: govwifi-sessions-db
+      DB_READ_REPLICA_HOSTNAME: govwifi-sessions-db
       DB_USER: root
       DB_PASS: testpassword
       DB_NAME: govwifi_local
