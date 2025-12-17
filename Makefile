@@ -5,7 +5,7 @@ setup: .frontend .authentication-api .logging-api .user-signup-api .admin
 build:
 	docker compose down
 	docker compose build --progress plain
-	docker compose up govwifi-frontend-raddb-local
+	docker compose up govwifi-frontend-raddb
 
 test: setup build
 	docker compose run --rm govwifi-test
@@ -60,6 +60,6 @@ destroy:
 	docker compose down --volumes
 
 clean:
-	rm -rf .frontend .logging-api .authentication-api
+	rm -rf .frontend .logging-api .authentication-api .admin .user-signup-api
 
 .PHONY: setup build test test-ci destroy clean
