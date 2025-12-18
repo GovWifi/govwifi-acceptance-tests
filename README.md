@@ -57,3 +57,65 @@ This is the Logging API, also known as PostAuth in the Radius domain
 
 It is pulled from the [govwifi-logging-api](https://github.com/GovWifi/govwifi-logging-api) repository
 and placed into the `.logging-api` folder.
+
+## Local Shell
+
+### Admin site set up to recieve traffic
+
+Set up testing Organisation and Location ready to begin. This will use the `local-dev/admin_database_configuration.rb` when setting up the database.
+
+```shell
+
+make admin-db-setup
+
+```
+
+### Radius Testing with eapol_test
+
+This is a tool to aid in learning and local development. It provides a running
+shell. From which you can run tools to run epol_test or use cURL to make API calls to local running services, inside the docker network.
+
+```shell
+
+# From the cli
+make shell
+
+# See docker-compose.yml for credential details.
+
+# Connect see the userdetails we can use.
+#
+echo "select username, password, email, mobile from userdetails;" | \
+ mariadb --skip-ssl --host=govwifi-user-details-db --password=testpassword -u root govwifi_local
+
+# username password email mobile
+# DSLPR SharpRegainDetailed NULL NULL
+
+# Recover the user authorisation password from the authentication API:
+#
+curl -s http://govwifi-authentication-api-local:8080/authorize/user/DSLPR | jq .
+{
+  "control:Cleartext-Password": "SharpRegainDetailed"
+}
+
+# Configure the environment for testing
+source ./setup.sh
+
+# Perform an eapol_test against the Radius server using PEAP for ok/fail scenarios:
+#
+eapol_test -a $RADIUS_SERVER_IP -c /usr/src/app/eap-peap-password-ok.conf -s testingradiussecret
+
+eapol_test -a $RADIUS_SERVER_IP -c /usr/src/app/eap-peap-incorrect-password.conf -s testingradiussecret
+
+
+# Perform an eapol_test against the Radius server using EAP-TLS:
+#
+# Successfull call
+eapol_test -a $RADIUS_SERVER_IP -c /usr/src/app/eap-tls.conf   -s testingradiussecret
+
+# CBA Fail Testing
+#
+eapol_test -a $RADIUS_SERVER_IP -c /usr/src/app/eap-tls-reject-client-key-not-found.conf -s testingradiussecret
+
+eapol_test -a $RADIUS_SERVER_IP -c /usr/src/app/eap-tls-mismatch-key.conf -s testingradiussecret
+
+```
