@@ -7,3 +7,7 @@ fake-s3/.certs
 fake-s3/*.pem
 fake-s3/cache/*
 fake-s3/logs/*
+.admin
+.frontend
+.logging-api
+.user-signup-api
