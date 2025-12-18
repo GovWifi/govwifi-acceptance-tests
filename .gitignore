@@ -11,4 +11,7 @@ fake-s3/cache/*
 fake-s3/logs/*
 eap.conf
 *DS_Store
-
+.admin
+.frontend
+.logging-api
+.user-signup-api

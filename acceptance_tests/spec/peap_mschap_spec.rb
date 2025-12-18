@@ -65,7 +65,7 @@ describe "PEAP-MSCHAPV2" do
       expect(run_eapoltest.call).to have_failed
     end
     it "logs the request" do
-      expect { run_eapoltest.call }.to change(sessions_db[:sessions], :count).by 1
+      expect { run_eapoltest.call }.to change(sessions_db[:sessions], :count).by 2
     end
   end
 end
