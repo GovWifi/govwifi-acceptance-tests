@@ -92,7 +92,7 @@ echo "select username, password, email, mobile from userdetails;" | \
 
 # Recover the user authorisation password from the authentication API:
 #
-curl -s http://govwifi-authentication-api-local:8080/authorize/user/DSLPR | jq .
+curl -s http://govwifi-authentication-api:8080/authorize/user/DSLPR | jq .
 {
   "control:Cleartext-Password": "SharpRegainDetailed"
 }
