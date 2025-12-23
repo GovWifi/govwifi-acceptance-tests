@@ -10,8 +10,7 @@ services:
       test: "mysql --user=root --password=testpassword -e 'SELECT 1'"
 
   govwifi-user-details-db:
-    image: mysql:8.0
-    command: "--default-authentication-plugin=mysql_native_password"
+    image: mysql:8.4
     environment:
       MYSQL_ROOT_PASSWORD: testpassword
       MYSQL_DATABASE: govwifi_local
