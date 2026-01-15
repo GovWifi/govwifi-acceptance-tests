@@ -10,8 +10,8 @@ if User.where(email: 'admin@example.com').present?
 end
 
 user = User.new({
- name: 'Joe Admin',
- email: 'admin@example.com',
+  name: 'Joe Admin',
+  email: 'admin@example.com',
   password: 'tagged-amount-gotcha',
   password_confirmation: 'tagged-amount-gotcha',
   is_super_admin: true
@@ -20,8 +20,8 @@ user.confirm
 user.save
 
 user2 = User.new({
- name: 'Tina Admin',
- email: 'admin+tina@example.com',
+  name: 'Tina Admin',
+  email: 'admin+tina@example.com',
   password: 'tagged-amount-gotcha',
   password_confirmation: 'tagged-amount-gotcha',
   is_super_admin: true
