@@ -101,6 +101,10 @@ services:
         condition: service_healthy
       govwifi-user-details-db:
         condition: service_healthy
+    healthcheck:
+      test: timeout 10s bash -c ':> /dev/tcp/127.0.0.1/8080' || exit 1
+      interval: 30s
+      timeout: 15s
 
   govwifi-logging-api:
     ports:
@@ -125,12 +129,23 @@ services:
         condition: service_healthy
       govwifi-user-details-db:
         condition: service_healthy
-
+    healthcheck:
+      test: timeout 10s bash -c ':> /dev/tcp/127.0.0.1/8080' || exit 1
+      interval: 30s
+      timeout: 15s
   govwifi-test:
     build:
       context: acceptance_tests
     depends_on:
       govwifi-frontend:
+        condition: service_healthy
+      govwifi-logging-api:
+        condition: service_healthy
+      govwifi-authentication-api:
+        condition: service_healthy
+      govwifi-usersignup:
+        condition: service_healthy
+      govwifi-admin:
         condition: service_healthy
     environment:
       DB_HOSTNAME: govwifi-sessions-db
@@ -215,6 +230,10 @@ services:
       ALLOW_PRIVATE_IP_FOR_LOCATION: "true"
     volumes:
       - ./:/app
+    healthcheck:
+      test: timeout 10s bash -c ':> /dev/tcp/127.0.0.1/3000' || exit 1
+      interval: 30s
+      timeout: 15s
 
   user-signup-db:
     ports:
@@ -233,6 +252,10 @@ services:
     image: cooisinmuvihill/notify-pit:latest
     environment:
       - NOTIFY_SECRET=cc3fdba9-c2d1-4144-a21a-c7e581a5b067
+    #   - DATABASE_URL=sqlite:///./data/notify.db
+    # volumes:
+    #   - ./app:/app/app
+    #   - ./notify-pit-data:/app/data
     healthcheck:
       # Bash magic to check the service is responding on port 8000. Saves having
       # to install curl or similar in the container.
@@ -273,6 +296,10 @@ services:
       NOTIFY_SUPPORT_REPLY: "support_reply_email_template_id"
     volumes:
       - ./:/app
+    healthcheck:
+      test: timeout 10s bash -c ':> /dev/tcp/127.0.0.1/3000' || exit 1
+      interval: 30s
+      timeout: 15s
 
   local-dev:
     build:

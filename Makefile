@@ -2,15 +2,18 @@ RADIUS_SERVER_IP := $()
 
 setup: .frontend .authentication-api .logging-api .user-signup-api .admin
 
+.PHONY: build
 build:
 	docker compose down
 	docker compose build --progress plain
 	docker compose up govwifi-frontend-raddb
 
+.PHONY: build
 test: setup build
 	docker compose run --rm govwifi-test
 
 ## used for codebuild / codepipeline to allow for custom branches
+.PHONY: build
 test-ci: build
 	docker compose run --rm govwifi-test
 
@@ -59,7 +62,6 @@ tail-logs:
 destroy:
 	docker compose down --volumes
 
+.PHONY: clean
 clean:
 	rm -rf .frontend .logging-api .authentication-api .admin .user-signup-api
-
-.PHONY: setup build test test-ci destroy clean
