@@ -12,6 +12,10 @@ services:
       test: "mysql --user=root --password=testpassword -e 'SELECT 1'"
 
   govwifi-user-details-db:
+    # This DB is shared by the authentication-api and user-signup-api. The
+    # user signup api creates the accounts. The Radius/frontend server will
+    # then call the authentication api to recover the details it will use to
+    # check with.
     ports:
       - "23306:3306"
     image: mysql:8.0
@@ -101,10 +105,6 @@ services:
         condition: service_healthy
       govwifi-user-details-db:
         condition: service_healthy
-    healthcheck:
-      test: timeout 10s bash -c ':> /dev/tcp/127.0.0.1/8080' || exit 1
-      interval: 30s
-      timeout: 15s
 
   govwifi-logging-api:
     ports:
@@ -129,24 +129,16 @@ services:
         condition: service_healthy
       govwifi-user-details-db:
         condition: service_healthy
-    healthcheck:
-      test: timeout 10s bash -c ':> /dev/tcp/127.0.0.1/8080' || exit 1
-      interval: 30s
-      timeout: 15s
+
   govwifi-test:
     build:
       context: acceptance_tests
     depends_on:
-      govwifi-frontend:
-        condition: service_healthy
-      govwifi-logging-api:
-        condition: service_healthy
-      govwifi-authentication-api:
-        condition: service_healthy
-      govwifi-usersignup:
-        condition: service_healthy
-      govwifi-admin:
-        condition: service_healthy
+      - govwifi-frontend
+      - govwifi-logging-api
+      - govwifi-authentication-api
+      - govwifi-usersignup
+      - govwifi-admin
     environment:
       DB_HOSTNAME: govwifi-sessions-db
       DB_NAME: govwifi_local
@@ -230,21 +222,6 @@ services:
       ALLOW_PRIVATE_IP_FOR_LOCATION: "true"
     volumes:
       - ./:/app
-    healthcheck:
-      test: timeout 10s bash -c ':> /dev/tcp/127.0.0.1/3000' || exit 1
-      interval: 30s
-      timeout: 15s
-
-  user-signup-db:
-    ports:
-      - "43306:3306"
-    image: mysql:8.0
-    command: "--default-authentication-plugin=mysql_native_password"
-    environment:
-      MYSQL_ROOT_PASSWORD: testpassword
-      MYSQL_DATABASE: usersignup
-    healthcheck:
-      test: "mysql --user=root --password=testpassword -e 'SELECT 1'"
 
   notify-pit:
     ports:
@@ -272,7 +249,8 @@ services:
         BUNDLE_INSTALL_CMD: bundle install --without test, vscodedev --no-cache --jobs 1 --retry 5
     restart: on-failure
     depends_on:
-      user-signup-db:
+      # CHANGE 1: Depend on the main user details DB instead of user-signup-db
+      govwifi-user-details-db:
         condition: service_healthy
       notify-pit:
         condition: service_healthy
@@ -280,15 +258,15 @@ services:
       - /usr/bin/entrypoint.sh
     environment:
       DEPLOY_ENV: development
-      DB_NAME: usersignup
+      # CHANGE 2: Point to the shared database name and hostname
+      DB_NAME: govwifi_local # Was: usersignup
       DB_PASS: testpassword
       DB_USER: root
-      DB_HOSTNAME: user-signup-db
+      DB_HOSTNAME: govwifi-user-details-db # Was: user-signup-db
       RACK_ENV: development
       S3_SIGNUP_ALLOWLIST_OBJECT_KEY: "somefile"
       S3_SIGNUP_ALLOWLIST_BUCKET: "some_bucket_to_store_signup_allowlist"
       S3_NOTIFICATION_TEMPLATES_BUCKET: "some_bucket_to_store_notification_templates"
-      # The secret key part is needed and should match NOTIFY_SECRET in notify-pit
       NOTIFY_API_KEY: notify_pit-00000000-0000-0000-0000-000000000000-cc3fdba9-c2d1-4144-a21a-c7e581a5b067
       NOTIFY_API_BASE_URL: http://notify-pit:8000
       GOVNOTIFY_BEARER_TOKEN: "dummy-bearer-token-1234"
@@ -296,10 +274,6 @@ services:
       NOTIFY_SUPPORT_REPLY: "support_reply_email_template_id"
     volumes:
       - ./:/app
-    healthcheck:
-      test: timeout 10s bash -c ':> /dev/tcp/127.0.0.1/3000' || exit 1
-      interval: 30s
-      timeout: 15s
 
   local-dev:
     build:
