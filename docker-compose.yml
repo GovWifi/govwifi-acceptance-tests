@@ -227,12 +227,9 @@ services:
     ports:
       - "4040:8000"
     image: cooisinmuvihill/notify-pit:latest
+    restart: on-failure
     environment:
       - NOTIFY_SECRET=cc3fdba9-c2d1-4144-a21a-c7e581a5b067
-    #   - DATABASE_URL=sqlite:///./data/notify.db
-    # volumes:
-    #   - ./app:/app/app
-    #   - ./notify-pit-data:/app/data
     healthcheck:
       # Bash magic to check the service is responding on port 8000. Saves having
       # to install curl or similar in the container.
@@ -274,7 +271,12 @@ services:
       NOTIFY_SUPPORT_REPLY: "support_reply_email_template_id"
     volumes:
       - ./:/app
-
+    healthcheck:
+      # Bash magic to check the service is responding on port 8000. Saves having
+      # to install curl or similar in the container.
+      test: wget http://localhost:3000/healthcheck
+      interval: 30s
+      timeout: 15s
   local-dev:
     build:
       context: local-dev
