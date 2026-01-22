@@ -134,11 +134,18 @@ services:
     build:
       context: acceptance_tests
     depends_on:
-      - govwifi-frontend
-      - govwifi-logging-api
-      - govwifi-authentication-api
-      - govwifi-usersignup
-      - govwifi-admin
+      govwifi-frontend:
+        condition: service_healthy
+      govwifi-logging-api:
+        condition: service_started
+      govwifi-authentication-api:
+        condition: service_started
+      govwifi-usersignup:
+        condition: service_healthy
+      govwifi-admin:
+        condition: service_started
+      notify-pit:
+        condition: service_healthy
     environment:
       DB_HOSTNAME: govwifi-sessions-db
       DB_NAME: govwifi_local
