@@ -258,6 +258,8 @@ services:
         condition: service_healthy
       notify-pit:
         condition: service_healthy
+      govwifi-notify-seeder:
+        condition: service_completed_successfully
     entrypoint:
       - /usr/bin/entrypoint.sh
     environment:
@@ -278,12 +280,24 @@ services:
       NOTIFY_SUPPORT_REPLY: "support_reply_email_template_id"
     volumes:
       - ./:/app
+      - ./local-dev/usersignup-entrypoint.sh:/usr/bin/entrypoint.sh
     healthcheck:
       # Bash magic to check the service is responding on port 8000. Saves having
       # to install curl or similar in the container.
-      test: wget http://localhost:3000/healthcheck
+      test: wget http://127.0.0.1:3000/healthcheck
       interval: 30s
       timeout: 15s
+  govwifi-notify-seeder:
+    image: ruby:3.4.7-alpine3.22
+    depends_on:
+      notify-pit:
+        condition: service_healthy
+    volumes:
+      - ./local-dev/seed_notify_templates.rb:/app/seed.rb
+    command: ruby /app/seed.rb
+    environment:
+      NOTIFY_PIT_URL: http://notify-pit:8000
+
   local-dev:
     build:
       context: local-dev
