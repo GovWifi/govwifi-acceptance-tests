@@ -20,11 +20,11 @@ test-ci: build
 # Assumes build has been run previously. Used for local development within this environment.
 .PHONY: local-dev
 local-dev:
-	docker compose up -d local-dev
+	docker compose up -d local-dev govwifi-developer-helper
 
 .PHONY: shell
 shell: local-dev
-	docker compose exec local-dev /bin/sh
+	docker compose exec local-dev /bin/sh -l
 
 .PHONY: admin-shell
 admin-shell: local-dev

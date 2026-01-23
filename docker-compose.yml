@@ -130,6 +130,77 @@ services:
       govwifi-user-details-db:
         condition: service_healthy
 
+  notify-pit:
+    ports:
+      - "4040:8000"
+    image: cooisinmuvihill/notify-pit:latest
+    restart: on-failure
+    environment:
+      - NOTIFY_SECRET=cc3fdba9-c2d1-4144-a21a-c7e581a5b067
+    healthcheck:
+      # Bash magic to check the service is responding on port 8000. Saves having
+      # to install curl or similar in the container.
+      test: timeout 10s bash -c ':> /dev/tcp/127.0.0.1/8000' || exit 1
+      interval: 30s
+      timeout: 15s
+
+  govwifi-usersignup:
+    ports:
+      - "48080:3000"
+    build:
+      context: .user-signup-api
+      args:
+        BUNDLE_INSTALL_CMD: bundle install --without test, vscodedev --no-cache --jobs 1 --retry 5
+    restart: on-failure
+    depends_on:
+      # CHANGE 1: Depend on the main user details DB instead of user-signup-db
+      govwifi-user-details-db:
+        condition: service_healthy
+      notify-pit:
+        condition: service_healthy
+      govwifi-notify-seeder:
+        condition: service_completed_successfully
+    entrypoint:
+      - /usr/bin/entrypoint.sh
+    environment:
+      DEPLOY_ENV: development
+      # CHANGE 2: Point to the shared database name and hostname
+      DB_NAME: govwifi_local # Was: usersignup
+      DB_PASS: testpassword
+      DB_USER: root
+      DB_HOSTNAME: govwifi-user-details-db # Was: user-signup-db
+      RACK_ENV: development
+      S3_SIGNUP_ALLOWLIST_OBJECT_KEY: "somefile"
+      S3_SIGNUP_ALLOWLIST_BUCKET: "some_bucket_to_store_signup_allowlist"
+      S3_NOTIFICATION_TEMPLATES_BUCKET: "some_bucket_to_store_notification_templates"
+      NOTIFY_API_KEY: notify_pit-00000000-0000-0000-0000-000000000000-cc3fdba9-c2d1-4144-a21a-c7e581a5b067
+      NOTIFY_API_BASE_URL: http://notify-pit:8000
+      GOVNOTIFY_BEARER_TOKEN: "dummy-bearer-token-1234"
+      NOTIFY_DO_NOT_REPLY: "do_not_reply_email_template_id"
+      NOTIFY_SUPPORT_REPLY: "support_reply_email_template_id"
+    volumes:
+      - ./:/app
+      - ./local-dev/usersignup-entrypoint.sh:/usr/bin/entrypoint.sh
+    healthcheck:
+      # Bash magic to check the service is responding on port 8000. Saves having
+      # to install curl or similar in the container.
+      test: wget http://127.0.0.1:3000/healthcheck
+      interval: 10s
+      timeout: 60s
+      retries: 5
+      start_period: 30s
+
+  govwifi-notify-seeder:
+    image: ruby:3.4.7-alpine3.22
+    depends_on:
+      notify-pit:
+        condition: service_healthy
+    volumes:
+      - ./local-dev/seed_notify_templates.rb:/app/seed.rb
+    command: ruby /app/seed.rb
+    environment:
+      NOTIFY_PIT_URL: http://notify-pit:8000
+
   govwifi-test:
     build:
       context: acceptance_tests
@@ -141,7 +212,9 @@ services:
       govwifi-authentication-api:
         condition: service_started
       govwifi-usersignup:
-        condition: service_healthy
+        condition: service_started
+      govwifi-notify-seeder:
+        condition: service_completed_successfully
       govwifi-admin:
         condition: service_started
       notify-pit:
@@ -230,76 +303,6 @@ services:
     volumes:
       - ./:/app
 
-  notify-pit:
-    ports:
-      - "4040:8000"
-    image: cooisinmuvihill/notify-pit:latest
-    restart: on-failure
-    environment:
-      - NOTIFY_SECRET=cc3fdba9-c2d1-4144-a21a-c7e581a5b067
-    healthcheck:
-      # Bash magic to check the service is responding on port 8000. Saves having
-      # to install curl or similar in the container.
-      test: timeout 10s bash -c ':> /dev/tcp/127.0.0.1/8000' || exit 1
-      interval: 30s
-      timeout: 15s
-
-  govwifi-usersignup:
-    ports:
-      - "48080:3000"
-    build:
-      context: .user-signup-api
-      args:
-        BUNDLE_INSTALL_CMD: bundle install --without test, vscodedev --no-cache --jobs 1 --retry 5
-    restart: on-failure
-    depends_on:
-      # CHANGE 1: Depend on the main user details DB instead of user-signup-db
-      govwifi-user-details-db:
-        condition: service_healthy
-      notify-pit:
-        condition: service_healthy
-      govwifi-notify-seeder:
-        condition: service_completed_successfully
-    entrypoint:
-      - /usr/bin/entrypoint.sh
-    environment:
-      DEPLOY_ENV: development
-      # CHANGE 2: Point to the shared database name and hostname
-      DB_NAME: govwifi_local # Was: usersignup
-      DB_PASS: testpassword
-      DB_USER: root
-      DB_HOSTNAME: govwifi-user-details-db # Was: user-signup-db
-      RACK_ENV: development
-      S3_SIGNUP_ALLOWLIST_OBJECT_KEY: "somefile"
-      S3_SIGNUP_ALLOWLIST_BUCKET: "some_bucket_to_store_signup_allowlist"
-      S3_NOTIFICATION_TEMPLATES_BUCKET: "some_bucket_to_store_notification_templates"
-      NOTIFY_API_KEY: notify_pit-00000000-0000-0000-0000-000000000000-cc3fdba9-c2d1-4144-a21a-c7e581a5b067
-      NOTIFY_API_BASE_URL: http://notify-pit:8000
-      GOVNOTIFY_BEARER_TOKEN: "dummy-bearer-token-1234"
-      NOTIFY_DO_NOT_REPLY: "do_not_reply_email_template_id"
-      NOTIFY_SUPPORT_REPLY: "support_reply_email_template_id"
-    volumes:
-      - ./:/app
-      - ./local-dev/usersignup-entrypoint.sh:/usr/bin/entrypoint.sh
-    healthcheck:
-      # Bash magic to check the service is responding on port 8000. Saves having
-      # to install curl or similar in the container.
-      test: wget http://127.0.0.1:3000/healthcheck
-      interval: 10s
-      timeout: 60s
-      retries: 5
-      start_period: 30s
-  govwifi-notify-seeder:
-    image: ruby:3.4.7-alpine3.22
-    depends_on:
-      notify-pit:
-        condition: service_healthy
-    volumes:
-      - ./local-dev/seed_notify_templates.rb:/app/seed.rb
-    command: ruby /app/seed.rb
-    environment:
-      NOTIFY_PIT_URL: http://notify-pit:8000
-
   local-dev:
     build:
       context: local-dev
@@ -310,7 +313,40 @@ services:
       - govwifi-fake-s3
       - govwifi-admin
       - govwifi-usersignup
+    # Override default CMD to just sleep for shell access
     entrypoint: '/bin/sh -c ''while true ; do sleep 10 ; echo "sleeping..." ; done'''
+    environment:
+      DB_HOSTNAME: govwifi-sessions-db
+      DB_NAME: govwifi_local
+      DB_USER: root
+      DB_PASS: testpassword
+      USER_DB_NAME: govwifi_local
+      USER_DB_PASS: testpassword
+      USER_DB_USER: root
+      USER_DB_HOSTNAME: govwifi-user-details-db
+      FRONTEND_CONTAINER: govwifi-frontend
+      RADIUS_KEY: testingradiussecret
+      AWS_DEFAULT_REGION: eu-west-1
+      AWS_ACCESS_KEY_ID: testkey
+      AWS_SECRET_ACCESS_KEY: testsecret
+      CERT_STORE_BUCKET: s3://certs-bucket
+      ENDPOINT_URL: "http://govwifi-fake-s3:4566"
+    volumes:
+      - ./:/app
+
+  govwifi-developer-helper:
+    build:
+      context: local-dev
+    ports:
+      - "4567:4567"
+    depends_on:
+      - govwifi-logging-api
+      - govwifi-authentication-api
+      - govwifi-frontend
+      - govwifi-fake-s3
+      - govwifi-admin
+      - govwifi-usersignup
+    # Uses default CMD ["ruby", "app.rb"]
     environment:
       DB_HOSTNAME: govwifi-sessions-db
       DB_NAME: govwifi_local
