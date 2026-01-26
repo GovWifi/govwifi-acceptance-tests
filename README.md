@@ -58,6 +58,13 @@ This is the Logging API, also known as PostAuth in the Radius domain
 It is pulled from the [govwifi-logging-api](https://github.com/GovWifi/govwifi-logging-api) repository
 and placed into the `.logging-api` folder.
 
+### User Signup
+
+This is the User Signup API, handling user registration and SMS/Email notifications.
+
+It is pulled from the [govwifi-user-signup-api](https://github.com/GovWifi/govwifi-user-signup-api) repository
+and placed into the `.user-signup-api` folder.
+
 ## Local Shell
 
 ### Admin site set up to recieve traffic
@@ -119,3 +126,16 @@ eapol_test -a $RADIUS_SERVER_IP -c /usr/src/app/eap-tls-reject-client-key-not-fo
 eapol_test -a $RADIUS_SERVER_IP -c /usr/src/app/eap-tls-mismatch-key.conf -s testingradiussecret
 
 ```
+
+## Developer Helper Web App
+
+A web interface is available to assist with local development tasks. It starts automatically when you run `make shell`.
+
+- **URL**: http://localhost:4567
+- **Features**:
+  - **Service Status**: View health of running Docker services.
+  - **SMS Testing**: Send "GO" SMS messages to the Signup API.
+  - **Verification**: Run EAP-PEAP tests with custom credentials.
+  - **Quick Links**: Access GovWifi Admin and Notify Pit.
+
+**Note**: You must run `source ./setup.sh` inside the `make shell` session to set up certificates before running verification tests.

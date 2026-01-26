@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GovWifi Local Dev Helper</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <header>
+            <div class="logo">
+                <div class="logo-icon">🛠️</div>
+                <h1>GovWifi Helper</h1>
+            </div>
+            <div class="status-indicator">
+                <span class="dot"></span> Local Environment
+            </div>
+        </header>
+
+        <main>
+            <section class="dashboard-grid">
+                <!-- Services Status Card -->
+                <div class="card services-card">
+                    <div class="card-header">
+                        <h2>Service Status</h2>
+                        <button id="refresh-services" class="icon-btn" title="Refresh"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 1 8.49 15"/></svg></button>
+                    </div>
+                    <div id="service-list" class="service-list">
+                        <div class="loading">Loading services...</div>
+                    </div>
+                </div>
+
+                <!-- Actions Card -->
+                <div class="card actions-card">
+                    <div class="card-header">
+                        <h2>Actions</h2>
+                    </div>
+
+                    <div class="action-group">
+                        <h3>User Signup</h3>
+                        <div class="input-group-vertical">
+                            <label for="api-url">API URL</label>
+                            <input type="text" id="api-url" value="http://govwifi-usersignup:3000/user-signup/sms-notification/notify">
+
+                            <label for="bearer-token">Bearer Token</label>
+                            <input type="text" id="bearer-token" value="dummy-bearer-token-1234">
+
+                            <label for="phone-number">Phone Number</label>
+                            <div class="input-group">
+                                <input type="text" id="phone-number" placeholder="07700900000" value="07700900000">
+                                <button id="btn-send-go" class="btn primary">Send "GO" SMS</button>
+                            </div>
+                        </div>
+                        <div id="sms-result" class="result-box hidden"></div>
+                    </div>
+
+                    <div class="separator"></div>
+
+                    <div class="action-group">
+                        <h3>Verification</h3>
+                        <p class="description">Run EAP-PEAP authentication test against local Radius.</p>
+
+                        <div class="input-group-vertical">
+                            <label for="eap-username">Username</label>
+                            <input type="text" id="eap-username" value="DSLPR" placeholder="DSLPR">
+
+                            <label for="eap-password">Password</label>
+                            <input type="text" id="eap-password" value="SharpRegainDetailed" placeholder="Password">
+
+                            <button id="btn-run-test" class="btn secondary">Run EAP-PEAP Test</button>
+                        </div>
+                        <div id="test-result-box" class="result-box hidden"></div>
+                        <pre id="test-output" class="terminal-output hidden"></pre>
+                    </div>
+                </div>
+
+                <!-- Quick Links Card -->
+                <div class="card links-card">
+                    <div class="card-header">
+                        <h2>Quick Links</h2>
+                    </div>
+                    <ul class="link-list">
+                        <li>
+                            <a href="http://localhost:38080" target="_blank" class="link-item">
+                                <span class="link-icon">ADMIN</span>
+                                <div class="link-info">
+                                    <span class="link-title">Admin Interface</span>
+                                    <span class="link-url">localhost:38080</span>
+                                </div>
+                                <svg class="arrow" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="http://localhost:4040" target="_blank" class="link-item">
+                                <span class="link-icon">NOTIFY</span>
+                                <div class="link-info">
+                                    <span class="link-title">Notify Pit</span>
+                                    <span class="link-url">localhost:4040</span>
+                                </div>
+                                <svg class="arrow" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchServices();
+
+            document.getElementById('refresh-services').addEventListener('click', fetchServices);
+
+            document.getElementById('btn-send-go').addEventListener('click', async () => {
+                const btn = document.getElementById('btn-send-go');
+                const resultBox = document.getElementById('sms-result');
+                const phone = document.getElementById('phone-number').value;
+                const apiUrl = document.getElementById('api-url').value;
+                const bearerToken = document.getElementById('bearer-token').value;
+
+                btn.disabled = true;
+                btn.textContent = 'Sending...';
+                resultBox.classList.add('hidden');
+
+                try {
+                    const res = await fetch('/api/send-go', {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            phoneNumber: phone,
+                            apiUrl: apiUrl,
+                            bearerToken: bearerToken
+                        })
+                    });
+                    const data = await res.json();
+
+                    resultBox.textContent = data.message;
+                    resultBox.className = `result-box visible ${data.status}`;
+                } catch (e) {
+                    resultBox.textContent = 'Error sending request';
+                    resultBox.className = 'result-box visible error';
+                } finally {
+                    btn.disabled = false;
+                    btn.textContent = 'Send "GO" SMS';
+                }
+            });
+
+            document.getElementById('btn-run-test').addEventListener('click', async () => {
+                const btn = document.getElementById('btn-run-test');
+                const output = document.getElementById('test-output');
+                const resultBox = document.getElementById('test-result-box');
+                const username = document.getElementById('eap-username').value;
+                const password = document.getElementById('eap-password').value;
+
+                btn.disabled = true;
+                btn.textContent = 'Running...';
+
+                output.classList.add('hidden');
+                resultBox.classList.add('hidden');
+
+                // Show loading state
+                output.textContent = 'Executing eapol_test...';
+                output.classList.remove('hidden');
+
+                try {
+                    const res = await fetch('/api/run-test', {
+                        method: 'POST',
+                        body: JSON.stringify({ username, password })
+                    });
+                    const data = await res.json();
+
+                    // Show status
+                    resultBox.textContent = `Result: ${data.status}`;
+                    resultBox.className = 'result-box visible';
+
+                    if (data.status === 'ACCEPTED') {
+                        resultBox.classList.add('success');
+                    } else {
+                        resultBox.classList.add('error');
+                    }
+
+                    // Show details
+                    output.textContent = `$ ${data.command}\n\n${data.stdout}\n${data.stderr}`;
+                    if (data.exit_code === 0) {
+                        output.classList.add('success-output');
+                    } else {
+                        output.classList.add('error-output');
+                    }
+                } catch (e) {
+                    output.textContent = 'Error running test';
+                    output.classList.add('error-output');
+                } finally {
+                    btn.disabled = false;
+                    btn.textContent = 'Run EAP-PEAP Test';
+                }
+            });
+        });
+
+        async function fetchServices() {
+            const list = document.getElementById('service-list');
+            try {
+                const res = await fetch('/api/services');
+                const data = await res.json();
+
+                list.innerHTML = data.map(svc => `
+                    <div class="service-item ${svc.status}">
+                        <div class="service-info">
+                            <span class="service-name">${svc.name}</span>
+                            <span class="service-detail">${svc.host}:${svc.port}</span>
+                        </div>
+                        <div class="service-status">
+                            ${svc.status.toUpperCase()}
+                        </div>
+                    </div>
+                `).join('');
+            } catch (e) {
+                list.innerHTML = '<div class="error">Failed to load services</div>';
+            }
+        }
+    </script>
+</body>
+</html>
