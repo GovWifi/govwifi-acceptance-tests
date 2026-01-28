@@ -41,9 +41,11 @@ to end tests, and pushing up to GitHub when all passing.
 
 ### Admin
 
-This is the GovWifi Admin Platform. It is pull from the
-[govwifi-admin](https://github.com/GovWifi/govwifi-admin) repository and placed
-into the `.admin` folder.
+This is the GovWifi Admin Platform, handling the configuration of Organisations
+and locations for GovWifi.
+
+It is pulled from the [govwifi-admin](https://github.com/GovWifi/govwifi-admin)
+repository and placed into the `.admin` folder.
 
 ### Frontend
 
