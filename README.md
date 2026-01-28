@@ -39,6 +39,12 @@ to end tests, and pushing up to GitHub when all passing.
 
 ## List of apps
 
+### Admin
+
+This is the GovWifi Admin Platform. It is pull from the
+[govwifi-admin](https://github.com/GovWifi/govwifi-admin) repository and placed
+into the `.admin` folder.
+
 ### Frontend
 
 These is the FreeRadius configuration, pulled from
@@ -76,6 +82,15 @@ Set up testing Organisation and Location ready to begin. This will use the `loca
 make admin-db-setup
 
 ```
+
+To log into the admin running in the development environment, you need to run
+`make admin-db-setup`. Then, after the `make shell` command is run to start all
+parts of the system, you can open `http://127.0.0.1:38080` in your browser.
+
+Admin credentials
+
+username: `admin@example.com`
+password: `tagged-amount-gotcha`
 
 ### Radius Testing with eapol_test
 
@@ -131,7 +146,7 @@ eapol_test -a $RADIUS_SERVER_IP -c /usr/src/app/eap-tls-mismatch-key.conf -s tes
 
 A web interface is available to assist with local development tasks. It starts automatically when you run `make shell`.
 
-- **URL**: http://localhost:4567
+- **URL**: <http://localhost:4567>
 - **Features**:
   - **Service Status**: View health of running Docker services.
   - **SMS Testing**: Send "GO" SMS messages to the Signup API.
