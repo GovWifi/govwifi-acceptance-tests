@@ -1,5 +1,8 @@
 RADIUS_SERVER_IP := $()
 
+.PHONY: setup
+setup: .frontend .authentication-api .logging-api .user-signup-api .admin
+
 .PHONY: build
 build:
 	docker compose down
