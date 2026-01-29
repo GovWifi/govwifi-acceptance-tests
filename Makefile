@@ -1,7 +1,5 @@
 RADIUS_SERVER_IP := $()
 
-setup: .frontend .authentication-api .logging-api .user-signup-api .admin
-
 .PHONY: build
 build:
 	docker compose down
@@ -59,9 +57,6 @@ tail-logs:
 .logging-api:
 	git clone https://github.com/GovWifi/govwifi-logging-api.git .logging-api
 
+.PHONY: destroy
 destroy:
 	docker compose down --volumes
-
-.PHONY: clean
-clean:
-	rm -rf .frontend .logging-api .authentication-api .admin .user-signup-api

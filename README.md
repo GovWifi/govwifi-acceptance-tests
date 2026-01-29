@@ -10,13 +10,13 @@ They are run whenever a change is made to this, govwifi-build, repository is mad
 To run the acceptance tests manually follow the instructions below:
 
 ```console
-make clean test
+make test
 ```
 
 would recommend to tear down the environment after use to free up resources, to do so run
 
 ```console
-make clean destroy
+make destroy
 ```
 
 If you make changes to any of the checked out apps you will want to rerun the
