@@ -1,5 +1,11 @@
 # Local environment setup for development and testing
 
+**Note**
+
+The VPN needs to be turned off when docker compose builds the images. The
+`make test` will trigger a build. The VPN prevents the Ruby gems from being
+downloaded, resulting in failure.
+
 ## Test structure
 
 Each Ruby application has its own set of unit tests which get run whenever a
