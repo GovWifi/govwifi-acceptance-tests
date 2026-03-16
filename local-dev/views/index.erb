@@ -5,7 +5,7 @@
     <title>GovWifi Local Dev Helper - GOV.UK</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="theme-color" content="#0b0c0c">
-    
+
     <!-- GOV.UK Frontend CSS -->
     <link href="/govuk-frontend/govuk-frontend.min.css" rel="stylesheet">
     <style>
@@ -13,12 +13,12 @@
       .app-service-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #b1b4b6; }
       .app-service-item:last-child { border-bottom: none; }
       .govuk-main-wrapper { min-height: 80vh; }
-      
+
       .hidden { display: none !important; }
       .result-box { padding: 15px; margin-top: 15px; border-left: 5px solid; word-break: break-all; }
       .result-box.success { border-color: #00703c; background-color: #f3f2f1; }
       .result-box.error { border-color: #d4351c; background-color: #f3f2f1; }
-      
+
       .terminal-output {
         background: #0b0c0c;
         color: #f3f2f1;
@@ -75,14 +75,14 @@
       <h1 class="govuk-heading-xl">Dashboard</h1>
 
       <div class="govuk-grid-row">
-        
+
         <!-- Left Column: Actions -->
         <div class="govuk-grid-column-two-thirds">
-          
+
           <h2 class="govuk-heading-l">Actions</h2>
-          
+
           <div class="govuk-accordion" data-module="govuk-accordion" id="accordion-default">
-            
+
             <!-- User Signup Accordion -->
             <div class="govuk-accordion__section">
               <div class="govuk-accordion__section-header">
@@ -97,32 +97,32 @@
                   <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
                     <h4 class="govuk-fieldset__heading">Send GO SMS</h4>
                   </legend>
-                  
+
                   <div class="govuk-form-group">
                     <label class="govuk-label" for="api-url">API URL</label>
                     <input class="govuk-input" id="api-url" name="api-url" type="text" value="http://govwifi-usersignup:3000/user-signup/sms-notification/notify">
                   </div>
-                  
+
                   <div class="govuk-form-group">
                     <label class="govuk-label" for="bearer-token">Bearer Token</label>
                     <input class="govuk-input" id="bearer-token" name="bearer-token" type="text" value="dummy-bearer-token-1234">
                   </div>
-                  
+
                   <div class="govuk-form-group">
                     <label class="govuk-label" for="phone-number">Phone Number</label>
                     <div id="phone-number-hint" class="govuk-hint">The phone number to send the signup request from (e.g. 07700900000)</div>
                     <input class="govuk-input govuk-input--width-20" id="phone-number" name="phone-number" type="tel" value="07700900000" aria-describedby="phone-number-hint">
                   </div>
-                  
+
                   <button class="govuk-button" data-module="govuk-button" id="btn-send-go">
                     Send "GO" SMS
                   </button>
-                  
+
                   <div id="sms-result" class="result-box hidden"></div>
                 </fieldset>
               </div>
             </div>
-            
+
             <!-- Verification Accordion -->
             <div class="govuk-accordion__section">
               <div class="govuk-accordion__section-header">
@@ -137,34 +137,46 @@
                   <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
                     <h4 class="govuk-fieldset__heading">Run EAP-PEAP Test</h4>
                   </legend>
-                  <p class="govuk-body">Run authentication test against the local Radius server.</p>
-                  
+                  <div class="govuk-body">
+                    Run authentication test against the local Radius server.</br>
+                    <p>
+                      After using "Send Go SMS" the credentials can be found by:
+                      <ul>
+                        <li>Going to <a href="http://localhost:4040/#notifications" class="govuk-link" target="_blank" rel="noopener noreferrer">Notify Pit Notifications</a></li>
+                        <li>Clicking on the "View JSON" link for one of the notifications</li>
+                        <li>Looking for the "personalisation" section in the "Message Payload"</li>
+                        <li>Using the "login" field value as the username</li>
+                        <li>Using the "pass" field value as the password</li>
+                      </ul>
+                    <p/>
+                  </div>
+
                   <div class="govuk-form-group">
                     <label class="govuk-label" for="eap-username">Username</label>
                     <input class="govuk-input govuk-!-width-one-half" id="eap-username" name="eap-username" type="text" placeholder="e.g. from SMS in Notify">
                   </div>
-                  
+
                   <div class="govuk-form-group">
                     <label class="govuk-label" for="eap-password">Password</label>
                     <input class="govuk-input govuk-!-width-one-half" id="eap-password" name="eap-password" type="text" placeholder="e.g. from SMS in Notify">
                   </div>
-                  
+
                   <button class="govuk-button govuk-button--secondary" data-module="govuk-button" id="btn-run-test">
                     Run EAP-PEAP Test
                   </button>
-                  
+
                   <div id="test-result-box" class="result-box hidden"></div>
                   <pre id="test-output" class="terminal-output hidden"></pre>
                 </fieldset>
               </div>
             </div>
-            
+
           </div>
         </div>
-        
+
         <!-- Right Column: Status & Links -->
         <div class="govuk-grid-column-one-third">
-          
+
           <!-- Services Card -->
           <div class="govuk-summary-card">
             <div class="govuk-summary-card__title-wrapper">
@@ -183,9 +195,9 @@
               </ul>
             </div>
           </div>
-          
+
           <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
-          
+
           <h2 class="govuk-heading-m">Quick Links</h2>
           <ul class="govuk-list govuk-list--bullet">
             <li>
@@ -255,7 +267,7 @@
 
                 resultBox.textContent = data.message;
                 resultBox.classList.remove('hidden');
-                
+
                 if (data.status === 'success') {
                     resultBox.classList.add('success');
                 } else {
