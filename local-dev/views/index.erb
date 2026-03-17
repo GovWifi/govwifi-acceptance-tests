@@ -1,224 +1,366 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="govuk-template">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GovWifi Local Dev Helper</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/css/style.css">
+    <meta charset="utf-8">
+    <title>GovWifi Local Dev Helper - GOV.UK</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#0b0c0c">
+
+    <!-- GOV.UK Frontend CSS -->
+    <link href="/govuk-frontend/govuk-frontend.min.css" rel="stylesheet">
+    <style>
+      .app-service-list { list-style: none; padding: 0; margin: 0; }
+      .app-service-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #b1b4b6; }
+      .app-service-item:last-child { border-bottom: none; }
+      .govuk-main-wrapper { min-height: 80vh; }
+
+      .hidden { display: none !important; }
+      .result-box { padding: 15px; margin-top: 15px; border-left: 5px solid; word-break: break-all; }
+      .result-box.success { border-color: #00703c; background-color: #f3f2f1; }
+      .result-box.error { border-color: #d4351c; background-color: #f3f2f1; }
+
+      .terminal-output {
+        background: #0b0c0c;
+        color: #f3f2f1;
+        padding: 15px;
+        font-family: monospace;
+        white-space: pre-wrap;
+        word-break: break-all;
+        margin-top: 15px;
+        max-height: 400px;
+        overflow-y: auto;
+      }
+      .terminal-output.error-output { color: #f47738; }
+    </style>
 </head>
-<body>
-    <div class="app-container">
-        <header>
-            <div class="logo">
-                <div class="logo-icon">🛠️</div>
-                <h1>GovWifi Helper</h1>
-            </div>
-            <div class="status-indicator">
-                <span class="dot"></span> Local Environment
-            </div>
-        </header>
+<body class="govuk-template__body">
+  <script>
+    document.body.className += ' js-enabled';
+  </script>
 
-        <main>
-            <section class="dashboard-grid">
-                <!-- Services Status Card -->
-                <div class="card services-card">
-                    <div class="card-header">
-                        <h2>Service Status</h2>
-                        <button id="refresh-services" class="icon-btn" title="Refresh"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 1 8.49 15"/></svg></button>
-                    </div>
-                    <div id="service-list" class="service-list">
-                        <div class="loading">Loading services...</div>
-                    </div>
-                </div>
+  <a href="#main-content" class="govuk-skip-link" data-module="govuk-skip-link">Skip to main content</a>
 
-                <!-- Actions Card -->
-                <div class="card actions-card">
-                    <div class="card-header">
-                        <h2>Actions</h2>
-                    </div>
+  <header class="govuk-header" role="banner" data-module="govuk-header">
+    <div class="govuk-header__container govuk-width-container">
+      <div class="govuk-header__logo">
+        <a href="/" class="govuk-header__link govuk-header__link--homepage">
+          <span class="govuk-header__logotype">
+            <span class="govuk-header__logotype-text">
+              GOV.UK
+            </span>
+          </span>
+        </a>
+      </div>
+      <div class="govuk-header__content">
+        <a href="/" class="govuk-header__link govuk-header__service-name">
+          GovWifi Local Dev Helper
+        </a>
+      </div>
+    </div>
+  </header>
 
-                    <div class="action-group">
-                        <h3>User Signup</h3>
-                        <div class="input-group-vertical">
-                            <label for="api-url">API URL</label>
-                            <input type="text" id="api-url" value="http://govwifi-usersignup:3000/user-signup/sms-notification/notify">
-
-                            <label for="bearer-token">Bearer Token</label>
-                            <input type="text" id="bearer-token" value="dummy-bearer-token-1234">
-
-                            <label for="phone-number">Phone Number</label>
-                            <div class="input-group">
-                                <input type="text" id="phone-number" placeholder="07700900000" value="07700900000">
-                                <button id="btn-send-go" class="btn primary">Send "GO" SMS</button>
-                            </div>
-                        </div>
-                        <div id="sms-result" class="result-box hidden"></div>
-                    </div>
-
-                    <div class="separator"></div>
-
-                    <div class="action-group">
-                        <h3>Verification</h3>
-                        <p class="description">Run EAP-PEAP authentication test against local Radius.</p>
-
-                        <div class="input-group-vertical">
-                            <label for="eap-username">Username</label>
-                            <input type="text" id="eap-username" value="" placeholder="Username from SMS in Notify">
-
-                            <label for="eap-password">Password</label>
-                            <input type="text" id="eap-password" value="" placeholder="Password from SMS in Notify">
-
-                            <button id="btn-run-test" class="btn secondary">Run EAP-PEAP Test</button>
-                        </div>
-                        <div id="test-result-box" class="result-box hidden"></div>
-                        <pre id="test-output" class="terminal-output hidden"></pre>
-                    </div>
-                </div>
-
-                <!-- Quick Links Card -->
-                <div class="card links-card">
-                    <div class="card-header">
-                        <h2>Quick Links</h2>
-                    </div>
-                    <ul class="link-list">
-                        <li>
-                            <a href="http://localhost:38080" target="_blank" class="link-item">
-                                <span class="link-icon">ADMIN</span>
-                                <div class="link-info">
-                                    <span class="link-title">Admin Interface</span>
-                                    <span class="link-url">localhost:38080</span>
-                                </div>
-                                <svg class="arrow" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="http://localhost:4040" target="_blank" class="link-item">
-                                <span class="link-icon">NOTIFY</span>
-                                <div class="link-info">
-                                    <span class="link-title">Notify Pit</span>
-                                    <span class="link-url">localhost:4040</span>
-                                </div>
-                                <svg class="arrow" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </section>
-        </main>
+  <div class="govuk-width-container">
+    <div class="govuk-phase-banner">
+      <p class="govuk-phase-banner__content">
+        <strong class="govuk-tag govuk-phase-banner__content__tag">
+          Local
+        </strong>
+        <span class="govuk-phase-banner__text">
+          Developer Helper Environment
+        </span>
+      </p>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
+    <main class="govuk-main-wrapper" id="main-content" role="main">
+      <h1 class="govuk-heading-xl">Dashboard</h1>
+
+      <div class="govuk-grid-row">
+
+        <!-- Left Column: Actions -->
+        <div class="govuk-grid-column-two-thirds">
+
+          <h2 class="govuk-heading-l">Actions</h2>
+
+          <div class="govuk-accordion" data-module="govuk-accordion" id="accordion-default">
+
+            <!-- User Signup Accordion -->
+            <div class="govuk-accordion__section">
+              <div class="govuk-accordion__section-header">
+                <h3 class="govuk-accordion__section-heading">
+                  <span class="govuk-accordion__section-button" id="accordion-default-heading-1">
+                    User Signup Form
+                  </span>
+                </h3>
+              </div>
+              <div id="accordion-default-content-1" class="govuk-accordion__section-content">
+                <fieldset class="govuk-fieldset">
+                  <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+                    <h4 class="govuk-fieldset__heading">Send GO SMS</h4>
+                  </legend>
+
+                  <div class="govuk-form-group">
+                    <label class="govuk-label" for="api-url">API URL</label>
+                    <input class="govuk-input" id="api-url" name="api-url" type="text" value="http://govwifi-usersignup:3000/user-signup/sms-notification/notify">
+                  </div>
+
+                  <div class="govuk-form-group">
+                    <label class="govuk-label" for="bearer-token">Bearer Token</label>
+                    <input class="govuk-input" id="bearer-token" name="bearer-token" type="text" value="dummy-bearer-token-1234">
+                  </div>
+
+                  <div class="govuk-form-group">
+                    <label class="govuk-label" for="phone-number">Phone Number</label>
+                    <div id="phone-number-hint" class="govuk-hint">The phone number to send the signup request from (e.g. 07700900000)</div>
+                    <input class="govuk-input govuk-input--width-20" id="phone-number" name="phone-number" type="tel" value="07700900000" aria-describedby="phone-number-hint">
+                  </div>
+
+                  <button class="govuk-button" data-module="govuk-button" id="btn-send-go">
+                    Send "GO" SMS
+                  </button>
+
+                  <div id="sms-result" class="result-box hidden"></div>
+                </fieldset>
+              </div>
+            </div>
+
+            <!-- Verification Accordion -->
+            <div class="govuk-accordion__section">
+              <div class="govuk-accordion__section-header">
+                <h3 class="govuk-accordion__section-heading">
+                  <span class="govuk-accordion__section-button" id="accordion-default-heading-2">
+                    Verification Tools
+                  </span>
+                </h3>
+              </div>
+              <div id="accordion-default-content-2" class="govuk-accordion__section-content">
+                <fieldset class="govuk-fieldset">
+                  <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+                    <h4 class="govuk-fieldset__heading">Run EAP-PEAP Test</h4>
+                  </legend>
+                  <div class="govuk-body">
+                    Run authentication test against the local Radius server.</br>
+                    <p>
+                      After using "Send Go SMS" the credentials can be found by:
+                      <ul>
+                        <li>Going to <a href="http://localhost:4040/#notifications" class="govuk-link" target="_blank" rel="noopener noreferrer">Notify Pit Notifications</a></li>
+                        <li>Clicking on the "View JSON" link for one of the notifications</li>
+                        <li>Looking for the "personalisation" section in the "Message Payload"</li>
+                        <li>Using the "login" field value as the username</li>
+                        <li>Using the "pass" field value as the password</li>
+                      </ul>
+                    <p/>
+                  </div>
+
+                  <div class="govuk-form-group">
+                    <label class="govuk-label" for="eap-username">Username</label>
+                    <input class="govuk-input govuk-!-width-one-half" id="eap-username" name="eap-username" type="text" placeholder="a valid username">
+                  </div>
+
+                  <div class="govuk-form-group">
+                    <label class="govuk-label" for="eap-password">Password</label>
+                    <input class="govuk-input govuk-!-width-one-half" id="eap-password" name="eap-password" type="text" placeholder="a valid password for username">
+                  </div>
+
+                  <button class="govuk-button govuk-button--secondary" data-module="govuk-button" id="btn-run-test">
+                    Run EAP-PEAP Test
+                  </button>
+
+                  <div id="test-result-box" class="result-box hidden"></div>
+                  <pre id="test-output" class="terminal-output hidden"></pre>
+                </fieldset>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Right Column: Status & Links -->
+        <div class="govuk-grid-column-one-third">
+
+          <!-- Services Card -->
+          <div class="govuk-summary-card">
+            <div class="govuk-summary-card__title-wrapper">
+              <h2 class="govuk-summary-card__title">Service Status</h2>
+              <ul class="govuk-summary-card__actions">
+                <li class="govuk-summary-card__action">
+                  <button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" id="refresh-services" style="padding: 5px 10px;">Refresh</button>
+                </li>
+              </ul>
+            </div>
+            <div class="govuk-summary-card__content">
+              <ul class="app-service-list" id="service-list">
+                <li class="app-service-item">
+                  <span class="govuk-body govuk-!-margin-bottom-0">Loading services...</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
+
+          <h2 class="govuk-heading-m">Quick Links</h2>
+          <ul class="govuk-list govuk-list--bullet">
+            <li>
+              <a href="http://localhost:38080" class="govuk-link" target="_blank" rel="noopener noreferrer">Admin Interface (localhost:38080)</a>
+            </li>
+            <li>
+              <a href="http://localhost:4040" class="govuk-link" target="_blank" rel="noopener noreferrer">Notify Pit (localhost:4040)</a>
+            </li>
+          </ul>
+
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <footer class="govuk-footer" role="contentinfo">
+    <div class="govuk-width-container">
+      <div class="govuk-footer__meta">
+        <div class="govuk-footer__meta-item govuk-footer__meta-item--grow">
+          <span class="govuk-footer__licence-description">
+            GovWifi Local Developer Helper Environment
+          </span>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- GOV.UK Frontend JS -->
+  <script type="module">
+    import { initAll } from '/govuk-frontend/govuk-frontend.min.js'
+    initAll()
+  </script>
+
+  <!-- App Logic -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        fetchServices();
+
+        document.getElementById('refresh-services').addEventListener('click', (e) => {
+            e.preventDefault();
             fetchServices();
-
-            document.getElementById('refresh-services').addEventListener('click', fetchServices);
-
-            document.getElementById('btn-send-go').addEventListener('click', async () => {
-                const btn = document.getElementById('btn-send-go');
-                const resultBox = document.getElementById('sms-result');
-                const phone = document.getElementById('phone-number').value;
-                const apiUrl = document.getElementById('api-url').value;
-                const bearerToken = document.getElementById('bearer-token').value;
-
-                btn.disabled = true;
-                btn.textContent = 'Sending...';
-                resultBox.classList.add('hidden');
-
-                try {
-                    const res = await fetch('/api/send-go', {
-                        method: 'POST',
-                        body: JSON.stringify({
-                            phoneNumber: phone,
-                            apiUrl: apiUrl,
-                            bearerToken: bearerToken
-                        })
-                    });
-                    const data = await res.json();
-
-                    resultBox.textContent = data.message;
-                    resultBox.className = `result-box visible ${data.status}`;
-                } catch (e) {
-                    resultBox.textContent = 'Error sending request';
-                    resultBox.className = 'result-box visible error';
-                } finally {
-                    btn.disabled = false;
-                    btn.textContent = 'Send "GO" SMS';
-                }
-            });
-
-            document.getElementById('btn-run-test').addEventListener('click', async () => {
-                const btn = document.getElementById('btn-run-test');
-                const output = document.getElementById('test-output');
-                const resultBox = document.getElementById('test-result-box');
-                const username = document.getElementById('eap-username').value;
-                const password = document.getElementById('eap-password').value;
-
-                btn.disabled = true;
-                btn.textContent = 'Running...';
-
-                output.classList.add('hidden');
-                resultBox.classList.add('hidden');
-
-                // Show loading state
-                output.textContent = 'Executing eapol_test...';
-                output.classList.remove('hidden');
-
-                try {
-                    const res = await fetch('/api/run-test', {
-                        method: 'POST',
-                        body: JSON.stringify({ username, password })
-                    });
-                    const data = await res.json();
-
-                    // Show status
-                    resultBox.textContent = `Result: ${data.status}`;
-                    resultBox.className = 'result-box visible';
-
-                    if (data.status === 'ACCEPTED') {
-                        resultBox.classList.add('success');
-                    } else {
-                        resultBox.classList.add('error');
-                    }
-
-                    // Show details
-                    output.textContent = `$ ${data.command}\n\n${data.stdout}\n${data.stderr}`;
-                    if (data.exit_code === 0) {
-                        output.classList.add('success-output');
-                    } else {
-                        output.classList.add('error-output');
-                    }
-                } catch (e) {
-                    output.textContent = 'Error running test';
-                    output.classList.add('error-output');
-                } finally {
-                    btn.disabled = false;
-                    btn.textContent = 'Run EAP-PEAP Test';
-                }
-            });
         });
 
-        async function fetchServices() {
-            const list = document.getElementById('service-list');
+        document.getElementById('btn-send-go').addEventListener('click', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('btn-send-go');
+            const resultBox = document.getElementById('sms-result');
+            const phone = document.getElementById('phone-number').value;
+            const apiUrl = document.getElementById('api-url').value;
+            const bearerToken = document.getElementById('bearer-token').value;
+
+            btn.disabled = true;
+            btn.textContent = 'Sending...';
+            resultBox.classList.add('hidden');
+            resultBox.className = 'result-box hidden'; // reset classes
+
             try {
-                const res = await fetch('/api/services');
+                const res = await fetch('/api/send-go', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        phoneNumber: phone,
+                        apiUrl: apiUrl,
+                        bearerToken: bearerToken
+                    })
+                });
                 const data = await res.json();
 
-                list.innerHTML = data.map(svc => `
-                    <div class="service-item ${svc.status}">
-                        <div class="service-info">
-                            <span class="service-name">${svc.name}</span>
-                            <span class="service-detail">${svc.host}:${svc.port}</span>
-                        </div>
-                        <div class="service-status">
-                            ${svc.status.toUpperCase()}
-                        </div>
-                    </div>
-                `).join('');
+                resultBox.textContent = data.message;
+                resultBox.classList.remove('hidden');
+
+                if (data.status === 'success') {
+                    resultBox.classList.add('success');
+                } else {
+                    resultBox.classList.add('error');
+                }
             } catch (e) {
-                list.innerHTML = '<div class="error">Failed to load services</div>';
+                resultBox.textContent = 'Error sending request: ' + e.message;
+                resultBox.classList.remove('hidden');
+                resultBox.classList.add('error');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Send "GO" SMS';
             }
+        });
+
+        document.getElementById('btn-run-test').addEventListener('click', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('btn-run-test');
+            const output = document.getElementById('test-output');
+            const resultBox = document.getElementById('test-result-box');
+            const username = document.getElementById('eap-username').value;
+            const password = document.getElementById('eap-password').value;
+
+            btn.disabled = true;
+            btn.textContent = 'Running...';
+
+            output.classList.add('hidden');
+            resultBox.classList.add('hidden');
+            output.className = 'terminal-output hidden'; // reset classes
+            resultBox.className = 'result-box hidden';
+
+            // Show loading state
+            output.textContent = 'Executing eapol_test...';
+            output.classList.remove('hidden');
+
+            try {
+                const res = await fetch('/api/run-test', {
+                    method: 'POST',
+                    body: JSON.stringify({ username, password })
+                });
+                const data = await res.json();
+
+                // Show status
+                resultBox.textContent = `Result: ${data.status}`;
+                resultBox.classList.remove('hidden');
+
+                if (data.status === 'ACCEPTED') {
+                    resultBox.classList.add('success');
+                } else {
+                    resultBox.classList.add('error');
+                }
+
+                // Show details
+                output.textContent = `$ ${data.command}\n\n${data.stdout}\n${data.stderr}`;
+                if (data.exit_code === 0) {
+                    output.classList.add('success');
+                } else {
+                    output.classList.add('error-output');
+                }
+            } catch (e) {
+                output.textContent = 'Error running test';
+                output.classList.add('error-output');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Run EAP-PEAP Test';
+            }
+        });
+    });
+
+    async function fetchServices() {
+        const list = document.getElementById('service-list');
+        try {
+            const res = await fetch('/api/services');
+            const data = await res.json();
+
+            list.innerHTML = data.map(svc => {
+                const tagClass = svc.status === 'online' ? 'govuk-tag--green' : 'govuk-tag--red';
+                return `
+                <li class="app-service-item">
+                    <div>
+                        <strong class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-0" style="display:block;">${svc.name}</strong>
+                        <span class="govuk-body-s govuk-!-margin-bottom-0 govuk-!-margin-top-1" style="color: #505a5f;">${svc.host}:${svc.port}</span>
+                    </div>
+                    <strong class="govuk-tag ${tagClass}">
+                        ${svc.status.toUpperCase()}
+                    </strong>
+                </li>
+                `
+            }).join('');
+        } catch (e) {
+            list.innerHTML = '<li><span class="govuk-error-message">Failed to load services</span></li>';
         }
-    </script>
+    }
+  </script>
 </body>
 </html>

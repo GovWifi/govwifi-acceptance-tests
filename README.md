@@ -2,6 +2,9 @@
 
 **Note**
 
+A laptop with 16GB of memory is needed to run the development environment
+successfully. The environment will not run on a laptop with 8GB of memory.
+
 The VPN needs to be turned off when docker compose builds the images. The
 `make test` will trigger a build. The VPN prevents the Ruby gems from being
 downloaded, resulting in failure.
