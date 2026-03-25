@@ -38,6 +38,7 @@ services:
       - DEFAULT_REGION=eu-west-1
       - AWS_ACCESS_KEY_ID=testkey
       - AWS_SECRET_ACCESS_KEY=testsecret
+      - LOCALSTACK_ACKNOWLEDGE_ACCOUNT_REQUIREMENT=1
     healthcheck:
       test: "[ $$(AWS_ACCESS_KEY_ID=fake AWS_SECRET_ACCESS_KEY=fake aws --endpoint-url=http://localhost:4566 s3 ls certs-bucket | wc -l) -gt 2 ]"
     volumes:
