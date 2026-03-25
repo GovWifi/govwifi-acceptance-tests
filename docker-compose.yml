@@ -29,7 +29,9 @@ services:
       test: "mysql --user=root --password=testpassword -e 'SELECT 1'"
 
   govwifi-fake-s3:
-    image: localstack/localstack
+    # See https://blog.localstack.cloud/2026-upcoming-pricing-changes/
+    # Pinning to a specific version of localstack that still has the free tier.
+    image: localstack/localstack:community-archive
     ports:
       - "4566:4566"
     environment:
@@ -38,7 +40,6 @@ services:
       - DEFAULT_REGION=eu-west-1
       - AWS_ACCESS_KEY_ID=testkey
       - AWS_SECRET_ACCESS_KEY=testsecret
-      - LOCALSTACK_ACKNOWLEDGE_ACCOUNT_REQUIREMENT=1
     healthcheck:
       test: "[ $$(AWS_ACCESS_KEY_ID=fake AWS_SECRET_ACCESS_KEY=fake aws --endpoint-url=http://localhost:4566 s3 ls certs-bucket | wc -l) -gt 2 ]"
     volumes:
