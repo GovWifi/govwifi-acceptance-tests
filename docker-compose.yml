@@ -31,6 +31,8 @@ services:
   govwifi-fake-s3:
     # See https://blog.localstack.cloud/2026-upcoming-pricing-changes/
     # Pinning to a specific version of localstack that still has the free tier.
+    # There will be no more fixes and security updates to this version. We will
+    # need to migrate to an alternative solution or pay for a license.
     image: localstack/localstack:community-archive
     ports:
       - "4566:4566"
