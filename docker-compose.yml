@@ -29,7 +29,13 @@ services:
       test: "mysql --user=root --password=testpassword -e 'SELECT 1'"
 
   govwifi-fake-s3:
-    image: localstack/localstack
+    # See https://blog.localstack.cloud/2026-upcoming-pricing-changes/ if you
+    # want to keep using localstack/localstack:latest
+    #
+    # Pinning to this version of localstack as it still has the free tier.
+    # There will be no more fixes and security updates to this version. We will
+    # need to migrate to an alternative solution or pay for a license.
+    image: localstack/localstack:community-archive
     ports:
       - "4566:4566"
     environment:
