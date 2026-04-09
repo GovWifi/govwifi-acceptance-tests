@@ -197,7 +197,7 @@ services:
       start_period: 30s
 
   govwifi-notify-seeder:
-    image: ruby:3.4.7-alpine3.22
+    image: ruby:3.4.9-alpine3.22
     depends_on:
       notify-pit:
         condition: service_healthy
