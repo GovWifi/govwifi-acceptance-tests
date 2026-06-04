@@ -25,6 +25,7 @@ describe "EAP TLS" do
     it "fails" do
       expect(run_eapoltest.call).to have_failed
     end
+  end
 
   context "Unsuccessful - wrong key" do
     let(:client_cert_path) { "/usr/src/app/certs/invalid_client.pem" }
