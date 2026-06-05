@@ -1,7 +1,7 @@
 RADIUS_SERVER_IP := $()
 
 .PHONY: setup
-setup: .frontend .authentication-api .logging-api .user-signup-api .admin
+setup: .frontend .authentication-api .logging-api .user-signup-api .admin .frontend/rlm_govlogger_module
 
 .PHONY: build
 build:
@@ -50,6 +50,8 @@ tail-logs:
 
 .frontend:
 	git clone -b GW-2772_Add_additional_logging_for_eap_tls_and_sessions https://github.com/GovWifi/govwifi-frontend.git .frontend
+
+.frontend/rlm_govlogger_module: .frontend
 	git clone https://github.com/GovWifi/govwifi-radius-custom-module.git .frontend/rlm_govlogger_module
 
 .authentication-api:
