@@ -1,9 +1,9 @@
-.authentication-api/**/*
-.frontend/**/*
-.user-signup-api/**/*
-.logging-api/**/*
-.backend/**/*
-.admin/**/*
+.authentication-api
+.frontend
+.user-signup-api
+.logging-api
+.backend
+.admin
 acceptance_tests/.certs
 fake-s3/.certs
 fake-s3/*.pem
