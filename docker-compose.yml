@@ -72,8 +72,10 @@ services:
       HEALTH_CHECK_IDENTITY: DSLPR
       HEALTH_CHECK_PASSWORD: SharpRegainDetailed
       RADIUSD_PARAMS: "-X"
+      GOVLOGGER_LOG_PROG_COMMAND: "/usr/bin/process_gov_logs --canonical --state /healthcheck/statefile --expires 10 --reduce_duplicates --reduce_freeradius_proxied --reduce_last_date_only --reduce_drop_eap_peap --wait 6 --logfile /healthcheck/govlogs.log >> /test_log_data/govlogs.out 2>>/test_log_data/govlogs.stderr"
     volumes:
       - raddb-certs:/etc/raddb/certs
+      - ./test_log_data:/test_log_data
 
   govwifi-frontend-raddb:
     build:
@@ -241,6 +243,8 @@ services:
       AWS_SECRET_ACCESS_KEY: testsecret
       CERT_STORE_BUCKET: s3://certs-bucket
       ENDPOINT_URL: "http://govwifi-fake-s3:4566"
+    volumes:
+      - ./test_log_data:/test_log_data
 
   govwifi-admin-db:
     ports:
