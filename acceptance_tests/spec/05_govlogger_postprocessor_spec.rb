@@ -6,14 +6,16 @@ describe "Govlogger postprocesser output" do
   context "Check log lines from post processor" do
 
     it "succeeds" do
+      # Wait for the postprocessor to finish running
+      sleep(10)
+
       lines = []
       f = File.open("/test_log_data/govlogs.out","r")
-      f.each do |line|
-        STDERR.puts(line)
-        STDERR.puts(JSON.parse(line))
+      f.each { |line|
         lines.push(JSON.parse(line))
-      end
+      }
 
+      # We expect 7 log events
       expect(lines.length).to eq 7
     end
   end
