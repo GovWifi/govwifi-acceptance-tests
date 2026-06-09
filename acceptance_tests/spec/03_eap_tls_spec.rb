@@ -61,8 +61,8 @@ describe "EAP TLS" do
     let(:client_cert_path) { "/usr/src/app/certs/client.pem" }
     let(:client_key_path)  { "/usr/src/app/certs/client.key" }
     let(:client_mac)       { "f5:23:78:27:71:05" }
-    sleep(12)
     it "succeeds" do
+      sleep(12)
       expect(run_eapoltest.call).to have_been_successful
     end
   end
