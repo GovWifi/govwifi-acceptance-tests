@@ -11,6 +11,7 @@ build:
 
 .PHONY: build
 test: setup build
+	rm -f test_log_data/*
 	docker compose run --rm govwifi-test
 
 ## used for codebuild / codepipeline to allow for custom branches
