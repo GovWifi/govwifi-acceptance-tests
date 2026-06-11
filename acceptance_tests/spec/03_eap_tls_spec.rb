@@ -57,12 +57,11 @@ describe "EAP TLS" do
     end
   end
 
-  context "Delayed success to flush logs" do
+  context "Success to flush logs" do
     let(:client_cert_path) { "/usr/src/app/certs/client.pem" }
     let(:client_key_path)  { "/usr/src/app/certs/client.key" }
     let(:client_mac)       { "f5:23:78:27:71:05" }
     it "succeeds" do
-      sleep(12)
       expect(run_eapoltest.call).to have_been_successful
     end
   end
