@@ -12,3 +12,4 @@ fake-s3/logs/*
 eap.conf
 *DS_Store
 .vscode
+test_log_data/*
