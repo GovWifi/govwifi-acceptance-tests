@@ -52,7 +52,6 @@ tail-logs:
 
 .frontend:
 	git clone -b GW-2772_Add_additional_logging_for_eap_tls_and_sessions https://github.com/GovWifi/govwifi-frontend.git .frontend
-	git clone https://github.com/GovWifi/govwifi-radius-custom-module.git .frontend/rlm_govlogger_module
 
 .authentication-api:
 	git clone https://github.com/GovWifi/govwifi-authentication-api.git .authentication-api
