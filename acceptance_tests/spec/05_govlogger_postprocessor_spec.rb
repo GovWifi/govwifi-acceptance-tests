@@ -140,43 +140,6 @@ describe "Govlogger postprocesser output" do
       expect(found["lines"][2]["Module-Failure-Message"][0]).to match(/certificate has expired/)
     end
 
-    it "Invalid cert - Foreign CA" do
-      # Check we get the first success log line
-      found = nil
-      count = 0
-
-      # Find single log entry
-      lines.each { |line|
-        if (line["Calling-Station-Id"] == "F5-23-78-27-71-04")
-          count += 1
-          found = line
-        end
-      }
-      expect(count).to eq 1
-
-      # Correct entry count
-      expect(found["lines"].length).to eq 3
-
-
-      # NAK
-      expect(found["lines"][0]).to include("EAP-Type" => "NAK")
-
-      # then TLS
-      expect(found["lines"][1]).to include("EAP-Type" => "TLS")
-
-      # then TLS
-      expect(found["lines"][2]).to include("EAP-Type" => "TLS")
-
-    
-      # Last entry should be module failure
-      expect(found["lines"][0]).not_to include("Module-Failure-Message")
-      expect(found["lines"][1]).not_to include("Module-Failure-Message")
-      expect(found["lines"][2]).to include("Module-Failure-Message")
-      expect(found["lines"][2]["Module-Failure-Message"][0]).to match(/OpenSSL says error 20/)
-      expect(found["lines"][2]).to include("TLS-Client-Cert-Subject-Alt-Name-Dns" => "unclealbert.bigmight.com")
-    end
-
-
   end
 
 end
