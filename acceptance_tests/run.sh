@@ -7,4 +7,4 @@ rm //test_log_data/*
 aws --endpoint-url=${ENDPOINT_URL} s3 cp ${CERT_STORE_BUCKET}/ /usr/src/app/certs/ --recursive
 
 # Run tests
-bundle exec rspec --order defined -f d
+bundle exec rspec --order defined
