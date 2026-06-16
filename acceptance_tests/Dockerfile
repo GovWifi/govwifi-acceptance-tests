@@ -13,6 +13,5 @@ RUN bundle config set with 'test' && bundle install
 RUN mkdir certs
 
 COPY . .
-RUN bundle install
 
 ENTRYPOINT "./run.sh"
