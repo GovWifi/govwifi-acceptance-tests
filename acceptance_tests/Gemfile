@@ -1,7 +1,7 @@
 source "https://rubygems.org"
 ruby File.read(".ruby-version").chomp
 
-gem "govwifi_eapoltest", git: "https://github.com/GovWifi/govwifi_eapoltest.git", branch: "feat/add-default-client-mac-address"
+gem "govwifi_eapoltest", "~> 0.2.0"
 gem "mysql2"
 gem "rspec"
 gem "rubocop-govuk"
