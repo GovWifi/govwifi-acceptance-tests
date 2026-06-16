@@ -1,8 +1,3 @@
-
-# This test is run following the 03_TLS test and checks the govlogger logs contain the correct
-# content. Hence the name 05_ prefix. The "--order defined" option is used on rspec to order by
-# filename
-
 require "spec_helper"
 require "json"
 
