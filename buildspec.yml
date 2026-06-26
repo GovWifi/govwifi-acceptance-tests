@@ -2,12 +2,14 @@ version: 0.2
 phases:
   pre_build:
     commands:
-    - echo "$DOCKER_HUB_AUTHTOKEN_ENV" | docker login -u $(echo $DOCKER_HUB_USERNAME_ENV) --password-stdin
-    - git clone -b $FRONTEND_BRANCH https://github.com/govwifi/govwifi-frontend.git .frontend
-    - git clone -b $AUTH_API_BRANCH https://github.com/govwifi/govwifi-authentication-api.git .authentication-api
-    - git clone -b $LOGGING_API_BRANCH https://github.com/govwifi/govwifi-logging-api.git .logging-api
+      - echo "$DOCKER_HUB_AUTHTOKEN_ENV" | docker login -u $(echo $DOCKER_HUB_USERNAME_ENV) --password-stdin
+      - git clone -b $FRONTEND_BRANCH https://github.com/govwifi/govwifi-frontend.git .frontend
+      - git clone -b $AUTH_API_BRANCH https://github.com/govwifi/govwifi-authentication-api.git .authentication-api
+      - git clone -b $LOGGING_API_BRANCH https://github.com/govwifi/govwifi-logging-api.git .logging-api
+      - git clone -b $USER_SIGNUP_API_BRANCH https://github.com/govwifi/govwifi-user-signup-api.git .user-signup-api
+      - git clone -b $ADMIN_BRANCH https://github.com/govwifi/govwifi-admin.git .admin
 
   build:
     commands:
-    - echo "Acceptance tests running"
-    - make test-ci
+      - echo "Acceptance tests running"
+      - make test-ci
