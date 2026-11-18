@@ -94,7 +94,7 @@ GEM
       rubocop (~> 1.81)
     ruby-progressbar (1.13.0)
     securerandom (0.4.1)
-    sequel (5.103.0)
+    sequel (5.110.0)
       bigdecimal
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
@@ -109,7 +109,7 @@ DEPENDENCIES
   mysql2
   rspec
   rubocop-govuk
-  sequel (~> 5.99)
+  sequel (~> 5.110)
 
 RUBY VERSION
    ruby 3.4.9p82
